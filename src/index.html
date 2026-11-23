@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>MOWATHAQ — Plateforme numérique de documentation et de certification des contrats</title>
+<!--
+  MOWATHAQ — source Tailwind. Le fichier autonome est généré dans dist/index.html par npm run build.
+  TODO : vérifier et citer la loi mauritanienne exacte sur la signature et les transactions électroniques.
+-->
+<style>__INLINE_CSS__</style>
+</head>
+<body class="app-bg h-full overflow-hidden bg-night font-body text-sand-light antialiased">
+
+<a href="#nav-prev" class="fixed left-4 top-[-100px] z-50 rounded-lg bg-sand px-4 py-2 text-night focus:top-3">Aller aux commandes de navigation</a>
+
+<!-- ============================================================
+     ARRIÈRE-PLAN : réseau de nœuds discret (aucun motif)
+     ============================================================ -->
+<div class="pointer-events-none fixed inset-0" aria-hidden="true">
+  <canvas id="network" class="net"></canvas>
+</div>
+
+<main id="deck" class="fixed inset-0" aria-label="Présentation MOWATHAQ">
+
+  <!-- 1. TITRE -->
+  <section class="slide is-active" id="slide-1" role="region" aria-roledescription="diapositive" aria-label="Diapositive 1 sur 9 : titre" aria-hidden="false">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col items-center justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y text-center">
+      <h1 class="font-display text-fluid-hero text-sand reveal motion-reduce:animate-none" style="--d:180ms" data-split>MOWATHAQ</h1>
+      <p class="max-w-[32ch] text-fluid-lead text-sand-light reveal" style="--d:420ms">Plateforme numérique de documentation et de certification des contrats</p>
+      <div class="grid w-full max-w-[1200px] grid-cols-3 items-start divide-x divide-sand/20 text-fluid-tag text-sand reveal" style="--d:540ms">
+        <div class="flex flex-col items-center gap-3 px-fluid-sm">
+          <span class="cover-icon grid h-14 w-14 place-items-center text-sand [&>svg]:h-full [&>svg]:w-full">__ICON_pen-line__</span>
+          <span class="leading-tight md:whitespace-nowrap">Signature électronique</span>
+        </div>
+        <div class="flex flex-col items-center gap-3 px-fluid-sm">
+          <span class="cover-icon grid h-14 w-14 place-items-center text-sand [&>svg]:h-full [&>svg]:w-full">__ICON_link__</span>
+          <span class="leading-tight md:whitespace-nowrap">Blockchain</span>
+        </div>
+        <div class="flex flex-col items-center gap-3 px-fluid-sm">
+          <span class="cover-icon grid h-14 w-14 place-items-center text-sand [&>svg]:h-full [&>svg]:w-full">__ICON_shield-check__</span>
+          <span class="leading-tight md:whitespace-nowrap">Confiance</span>
+        </div>
+      </div>
+    </div>
+    <div class="absolute inset-x-0 bottom-[clamp(58px,8vh,92px)] flex flex-col items-center gap-1 px-fluid-pad-x text-fluid-label uppercase tracking-[.14em] text-sand/60 reveal" style="--d:680ms">
+      <span>Atelier Pratique</span>
+      <span>ÉQUIPE 24173 · 24231 · 24029 · 24245 · 24259</span>
+    </div>
+  </section>
+
+  <!-- 2. LE PROBLÈME LOCAL -->
+  <section class="slide" id="slide-2" role="region" aria-roledescription="diapositive" aria-label="Diapositive 2 sur 9 : le problème local" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <div class="flex flex-col gap-fluid-xs">
+        <h2 class="max-w-[1500px] font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Le problème local</h2>
+        <p class="max-w-[82ch] text-fluid-lead text-sand-light reveal" style="--d:200ms">Aujourd'hui, signer un contrat est lent, risqué et souvent informel.</p>
+      </div>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3">
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 hover:shadow-[0_24px_60px_rgba(210,180,140,0.16)] focus-within:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:330ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Bureaucratie</h3>
+          <p class="text-fluid-card text-sand-light/90">Démarches longues et déplacements multiples ; délais de validation et de légalisation.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 hover:shadow-[0_24px_60px_rgba(210,180,140,0.16)] focus-within:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:430ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Fraude</h3>
+          <p class="text-fluid-card text-sand-light/90">Faux, falsification et antidatage ; documents difficiles à vérifier.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 hover:shadow-[0_24px_60px_rgba(210,180,140,0.16)] focus-within:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:530ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Informalité</h3>
+          <p class="text-fluid-card text-sand-light/90">Accords verbaux ou papiers sans preuve ; litiges fréquents sans trace fiable.</p>
+        </article>
+      </div>
+      <div class="flex items-center gap-fluid-sm rounded-xl border border-sand/30 bg-sand/10 px-fluid-md py-fluid-sm text-fluid-small text-sand-light reveal" style="--d:660ms">
+        <span class="text-[clamp(22px,2vw,36px)] text-sand">__ICON_file-text__</span>
+        <span><span class="text-sand">Conséquences :</span> perte de temps, litiges coûteux et manque de confiance.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. LA SOLUTION -->
+  <section class="slide" id="slide-3" role="region" aria-roledescription="diapositive" aria-label="Diapositive 3 sur 9 : la solution MOWATHAQ" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <div class="flex flex-col gap-fluid-xs">
+        <h2 class="max-w-[1500px] font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>La solution : MOWATHAQ</h2>
+        <p class="max-w-[82ch] text-fluid-lead text-sand-light reveal" style="--d:200ms">Un contrat créé, signé et certifié en ligne, en trois étapes.</p>
+      </div>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3">
+        <article class="step-dot relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md pt-[clamp(24px,3vh,42px)] shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:310ms">
+          <span class="absolute right-fluid-md top-fluid-sm font-body text-fluid-small tracking-[.2em] text-sand/60">01</span>
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Rédiger</h3>
+          <p class="text-fluid-card text-sand-light/90">Modèles de contrats (location, vente, partenariat) : gain de temps.</p>
+        </article>
+        <article class="step-dot relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md pt-[clamp(24px,3vh,42px)] shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:410ms">
+          <span class="absolute right-fluid-md top-fluid-sm font-body text-fluid-small tracking-[.2em] text-sand/60">02</span>
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_pen-line__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Signer</h3>
+          <p class="text-fluid-card text-sand-light/90">Signature électronique de chaque partie, à distance : preuve infalsifiable.</p>
+        </article>
+        <article class="step-dot relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md pt-[clamp(24px,3vh,42px)] shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:510ms">
+          <span class="absolute right-fluid-md top-fluid-sm font-body text-fluid-small tracking-[.2em] text-sand/60">03</span>
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_link__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Certifier</h3>
+          <p class="text-fluid-card text-sand-light/90">Empreinte du contrat enregistrée sur la Blockchain, horodatée et infalsifiable : vérification en un clic.</p>
+        </article>
+      </div>
+      <div class="flex flex-col items-center gap-fluid-sm rounded-2xl border border-sand/20 bg-sand/5 px-fluid-md py-fluid-md md:flex-row reveal" style="--d:650ms">
+        <div class="flex items-center gap-[clamp(6px,.9vw,14px)] text-sand" aria-hidden="true">
+          <span class="grid h-[clamp(36px,3.4vw,58px)] w-[clamp(36px,3.4vw,58px)] place-items-center rounded-xl border border-sand/30 text-[clamp(20px,2vw,34px)]">__ICON_file-text__</span>
+          <span class="hash-link"></span>
+          <span class="grid h-[clamp(36px,3.4vw,58px)] w-[clamp(36px,3.4vw,58px)] place-items-center rounded-xl border border-sand/30 text-[clamp(20px,2vw,34px)]">__ICON_link__</span>
+          <span class="hash-link"></span>
+          <span class="grid h-[clamp(36px,3.4vw,58px)] w-[clamp(36px,3.4vw,58px)] place-items-center rounded-xl border border-sand/30 text-[clamp(20px,2vw,34px)]">__ICON_link__</span>
+        </div>
+        <p class="text-fluid-small text-sand-light">Le contrat n'est pas stocké sur la Blockchain, seulement son empreinte numérique (hash). Si une seule lettre change, l'empreinte change et la fraude est détectée.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. EXEMPLE CONCRET -->
+  <section class="slide" id="slide-4" role="region" aria-roledescription="diapositive" aria-label="Diapositive 4 sur 9 : exemple concret" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <div class="grid grid-cols-1 items-center gap-fluid-sm lg:grid-cols-[1.2fr_0.8fr]">
+        <div class="flex flex-col gap-fluid-sm">
+          <div class="flex flex-col gap-fluid-xs">
+            <h2 class="font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Exemple concret</h2>
+            <p class="max-w-[82ch] text-fluid-lead text-sand-light reveal" style="--d:200ms">Un propriétaire à Zouérat loue un appartement.</p>
+          </div>
+          <div class="timeline relative" id="timeline">
+            <span class="timeline-rail pointer-events-none absolute" aria-hidden="true"></span>
+            <span class="timeline-progress pointer-events-none absolute transition-[height] duration-500 ease-out motion-reduce:transition-none" aria-hidden="true"></span>
+            <ol class="flex flex-col gap-[clamp(10px,1.4vh,20px)]">
+              <li class="t-row is-current grid grid-cols-[40px_minmax(0,1fr)] items-start gap-[clamp(8px,1vw,16px)]"><span class="t-dot" aria-hidden="true"></span><span>Le propriétaire choisit le modèle « Location » et remplit le contrat sur son téléphone.</span></li>
+              <li class="t-row grid grid-cols-[40px_minmax(0,1fr)] items-start gap-[clamp(8px,1vw,16px)]"><span class="t-dot" aria-hidden="true"></span><span>Le locataire reçoit un lien ou un code par SMS et vérifie son identité.</span></li>
+              <li class="t-row grid grid-cols-[40px_minmax(0,1fr)] items-start gap-[clamp(8px,1vw,16px)]"><span class="t-dot" aria-hidden="true"></span><span>Les deux parties signent électroniquement depuis chez elles.</span></li>
+              <li class="t-row grid grid-cols-[40px_minmax(0,1fr)] items-start gap-[clamp(8px,1vw,16px)]"><span class="t-dot" aria-hidden="true"></span><span>L'empreinte est certifiée sur la Blockchain en quelques minutes.</span></li>
+              <li class="t-row grid grid-cols-[40px_minmax(0,1fr)] items-start gap-[clamp(8px,1vw,16px)]"><span class="t-dot" aria-hidden="true"></span><span>Le contrat est archivé en sécurité, vérifiable en un clic en cas de litige.</span></li>
+            </ol>
+          </div>
+        </div>
+        <div class="flex justify-center reveal" style="--d:300ms">
+          <div class="phone w-[clamp(150px,16vw,300px)] rounded-[2.5rem] border-2 border-sand/40" aria-hidden="true">
+            <div class="phone-screen is-current rounded-[2rem] text-fluid-phone" data-screen="0">
+              <div class="app-title">MOWATHAQ</div>
+              <div class="h-px bg-sand/20"></div>
+              <div class="app-label">Nouveau contrat</div>
+              <div class="app-value">Modèle : Location</div>
+              <div class="app-value">Parties : 2 à renseigner</div>
+              <div class="app-value">Statut : formulaire en cours</div>
+              <div class="app-badge"><span class="text-sand">__ICON_lock__</span>Rédaction en cours</div>
+            </div>
+            <div class="phone-screen rounded-[2rem] text-fluid-phone" data-screen="1">
+              <div class="app-title">MOWATHAQ</div>
+              <div class="h-px bg-sand/20"></div>
+              <div class="app-label">Vérification</div>
+              <div class="app-value">Code reçu par SMS</div>
+              <div class="app-code"><span>4</span><span>7</span><span>2</span><span>9</span></div>
+              <div class="app-badge"><span class="text-sand">__ICON_smartphone__</span>Identité confirmée</div>
+            </div>
+            <div class="phone-screen rounded-[2rem] text-fluid-phone" data-screen="2">
+              <div class="app-title">MOWATHAQ</div>
+              <div class="h-px bg-sand/20"></div>
+              <div class="app-label">Signature</div>
+              <div class="app-value">Contrat : Location</div>
+              <div class="app-signature"><span>__ICON_pen-line__</span></div>
+              <div class="app-badge"><span class="text-sand">__ICON_check-circle__</span>Deux signatures enregistrées</div>
+            </div>
+            <div class="phone-screen rounded-[2rem] text-fluid-phone" data-screen="3">
+              <div class="app-title">MOWATHAQ</div>
+              <div class="h-px bg-sand/20"></div>
+              <div class="app-label">Certification</div>
+              <div class="app-value">Empreinte du contrat</div>
+              <div class="app-hash">a3f1 8c02 7bd4 9e27</div>
+              <div class="app-badge"><span class="text-sand">__ICON_link__</span>Horodatage et bloc enregistré</div>
+            </div>
+            <div class="phone-screen rounded-[2rem] text-fluid-phone" data-screen="4">
+              <div class="app-title">MOWATHAQ</div>
+              <div class="h-px bg-sand/20"></div>
+              <div class="app-label">Archivage</div>
+              <div class="app-value">Contrat : Location</div>
+              <div class="app-signature"><span>__ICON_lock__</span></div>
+              <div class="app-badge"><span class="text-sand">__ICON_check-circle__</span>Vérification en un clic</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-fluid-md grid grid-cols-1 items-center gap-fluid-sm md:grid-cols-[1fr_auto_1fr] reveal" style="--d:520ms">
+        <div class="rounded-xl border border-sand/20 bg-sand/5 px-fluid-md py-fluid-sm text-fluid-small text-sand-light"><span class="text-sand">Avant :</span> plusieurs déplacements, plusieurs jours.</div>
+        <span class="hidden text-[clamp(22px,2.4vw,40px)] text-sand md:block" aria-hidden="true">__ICON_arrow-right__</span>
+        <div class="rounded-xl border border-sand/20 bg-sand/5 px-fluid-md py-fluid-sm text-fluid-small text-sand-light"><span class="text-sand">Avec MOWATHAQ :</span> quelques minutes, depuis le téléphone.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. DESCRIPTION DU PROJET -->
+  <section class="slide" id="slide-5" role="region" aria-roledescription="diapositive" aria-label="Diapositive 5 sur 9 : description du projet" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <h2 class="font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Description du projet</h2>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3">
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:260ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Besoin</h3>
+          <ul class="list-none space-y-fluid-xs text-fluid-card text-sand-light/90">
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Contrats informels, lents à valider.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Exposés à la fraude.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Pas de preuve fiable ni d'archivage sûr.</span></li>
+          </ul>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:360ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_shield-check__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Solution</h3>
+          <p class="text-fluid-card text-sand-light/90">Plateforme web et mobile de signature électronique avec certification Blockchain et archivage sécurisé.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:460ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_check-circle__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Bénéficiaires</h3>
+          <ul class="list-none space-y-fluid-xs text-fluid-card text-sand-light/90">
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Particuliers : propriétaires et locataires.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Commerçants et PME.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Agences immobilières.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Notaires et administrations.</span></li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. VALIDITÉ JURIDIQUE ET CONFIANCE -->
+  <!-- TODO : vérifier et citer la loi mauritanienne exacte sur la signature et les transactions électroniques -->
+  <section class="slide" id="slide-6" role="region" aria-roledescription="diapositive" aria-label="Diapositive 6 sur 9 : validité juridique et confiance" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <h2 class="max-w-[1600px] font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Validité juridique et confiance</h2>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-2">
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:260ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_shield-check__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Identification des signataires</h3>
+          <p class="text-fluid-card text-sand-light/90">Pièce d'identité, numéro de téléphone vérifié et code de confirmation par SMS.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:350ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Horodatage et traçabilité</h3>
+          <p class="text-fluid-card text-sand-light/90">Chaque action est datée et enregistrée.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:440ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_lock__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Intégrité</h3>
+          <p class="text-fluid-card text-sand-light/90">L'empreinte Blockchain prouve que le contrat n'a pas été modifié.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:530ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_scale__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Cadre légal</h3>
+          <p class="text-fluid-card text-sand-light/90">Le projet s'appuie sur la reconnaissance de la signature et des transactions électroniques. Il sera mené en partenariat avec des notaires et des juristes pour garantir la validité juridique.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. LES VALEURS AJOUTÉES -->
+  <section class="slide" id="slide-7" role="region" aria-roledescription="diapositive" aria-label="Diapositive 7 sur 9 : les valeurs ajoutées" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <h2 class="font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Les valeurs ajoutées</h2>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3">
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:270ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_check-circle__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Sociale</h3>
+          <ul class="list-none space-y-fluid-xs text-fluid-card text-sand-light/90">
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Confiance entre les parties.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Moins de litiges et de conflits.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Transparence et justice.</span></li>
+          </ul>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:370ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Économique</h3>
+          <ul class="list-none space-y-fluid-xs text-fluid-card text-sand-light/90">
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Gain de temps et de coûts.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Transactions sécurisées.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Économie locale digitalisée.</span></li>
+          </ul>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:470ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Religieuse</h3>
+          <ul class="list-none space-y-fluid-xs text-fluid-card text-sand-light/90">
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Respect de l'écrit des contrats.</span></li>
+            <li class="flex items-start gap-[.6em]"><span class="mt-[.3em] text-[.75em] leading-none text-sand">__ICON_check-circle__</span><span>Protection des droits de chacun.</span></li>
+          </ul>
+        </article>
+      </div>
+      <div class="flex items-center gap-fluid-sm rounded-xl border border-sand/30 bg-sand/10 px-fluid-md py-fluid-sm text-fluid-small text-sand-light reveal" style="--d:610ms">
+        <span class="text-[clamp(22px,2vw,36px)] text-sand">__ICON_check-circle__</span>
+        <span class="text-sand">Accès simple pour tous, sans déplacement.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. BONUS : RESPECT DES VALEURS DE L'ISLAM -->
+  <section class="slide" id="slide-8" role="region" aria-roledescription="diapositive" aria-label="Diapositive 8 sur 9 : respect des valeurs de l'islam" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <h2 class="max-w-[1600px] font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:70ms" data-split>Bonus : respect des valeurs de l'Islam</h2>
+      <div class="relative px-fluid-md py-fluid-md text-center reveal" style="--d:180ms">
+
+
+
+
+        <p class="verse font-arabic font-bold text-fluid-verse text-sand-light" dir="rtl" lang="ar">يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا تَدَايَنتُم بِدَيْنٍ إِلَىٰ أَجَلٍ مُّسَمًّى فَاكْتُبُوهُ</p>
+      </div>
+      <div class="text-center reveal" style="--d:420ms">
+        <p class="text-fluid-small text-sand-light">« Ô vous qui croyez ! Quand vous contractez une dette à échéance déterminée, mettez-la par écrit. »</p>
+        <p class="text-fluid-label text-sand/60">Sourate Al-Baqarah, verset 282</p>
+      </div>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3 reveal" style="--d:560ms">
+        <article class="rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_pen-line__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>L'écrit</h3>
+          <p class="text-fluid-card text-sand-light/90">Fixer l'engagement de façon claire, sans ambiguïté.</p>
+        </article>
+        <article class="rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_shield-check__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>La transparence</h3>
+          <p class="text-fluid-card text-sand-light/90">Preuve vérifiable par les parties.</p>
+        </article>
+        <article class="rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_scale__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>L'éthique</h3>
+          <p class="text-fluid-card text-sand-light/90">Justice, honnêteté et protection contre la tromperie.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CONCLUSION -->
+  <section class="slide" id="slide-9" role="region" aria-roledescription="diapositive" aria-label="Diapositive 9 sur 9 : conclusion" aria-hidden="true">
+    <div class="relative z-10 mx-auto flex h-full w-full max-w-[1700px] flex-col justify-center gap-fluid-sm px-fluid-pad-x pb-[clamp(62px,8vh,98px)] pt-fluid-pad-y">
+      <h2 class="font-display text-fluid-display text-sand reveal motion-reduce:animate-none" style="--d:80ms" data-split>Conclusion</h2>
+      <div class="grid grid-cols-1 gap-fluid-sm md:grid-cols-3">
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:260ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_file-text__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Un problème local réel</h3>
+          <p class="text-fluid-card text-sand-light/90">Lenteur, fraude et informalité.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:360ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_link__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Une solution simple</h3>
+          <p class="text-fluid-card text-sand-light/90">Signature électronique et Blockchain.</p>
+        </article>
+        <article class="relative rounded-2xl border border-sand/20 bg-sand/5 p-fluid-md shadow-[0_18px_50px_rgba(0,33,71,0.4)] transition duration-300 ease-out hover:-translate-y-1 hover:border-sand/60 motion-reduce:transition-none motion-reduce:hover:translate-y-0 reveal" style="--d:460ms">
+          <div class="mb-fluid-sm grid h-[clamp(38px,3.2vw,62px)] w-[clamp(38px,3.2vw,62px)] place-items-center rounded-xl border border-sand/30 text-[clamp(24px,2.2vw,40px)] text-sand">__ICON_check-circle__</div>
+          <h3 class="mb-fluid-xs font-display text-fluid-card-title text-sand-light" data-split>Des valeurs fortes</h3>
+          <p class="text-fluid-card text-sand-light/90">Sociales, économiques et religieuses.</p>
+        </article>
+      </div>
+      <div class="flex items-center justify-center gap-fluid-sm rounded-2xl border border-sand bg-sand/10 px-fluid-md py-fluid-md text-center text-fluid-lead text-sand-light reveal" style="--d:580ms">
+        <span class="text-[clamp(26px,3vw,48px)] text-sand">__ICON_arrow-right__</span>
+        <span>Lancer un pilote avec des propriétaires, commerçants et agences locales.</span>
+      </div>
+      <div class="text-center reveal" style="--d:700ms">
+        <p class="text-fluid-thanks text-sand"><span class="font-display">MERCI</span><span class="font-body">&#8239;!</span> <span class="block text-fluid-lead text-sand-light">Vos questions ?</span></p>
+        <p class="mt-fluid-sm text-fluid-label uppercase tracking-[.14em] text-sand/60">ÉQUIPE MOWATHAQ · 24173 · 24231 · 24029 · 24245 · 24259</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     NAVIGATION, PROGRESSION, COMPTEUR
+     ============================================================ -->
+<div class="pointer-events-none fixed inset-x-0 top-0" aria-hidden="true"><div class="h-[3px] bg-sand/10"><span id="progress-fill" class="progress-fill block h-full w-[11.11%] bg-sand"></span></div></div>
+<div id="counter" class="pointer-events-none fixed right-[clamp(18px,3vw,48px)] top-[clamp(14px,2.4vh,28px)] text-fluid-label tracking-[.24em] text-sand/60" aria-hidden="true">01 / 09</div>
+<nav class="fixed inset-x-0 bottom-[clamp(10px,1.8vh,22px)] flex items-center justify-center gap-fluid-sm" aria-label="Navigation de la présentation">
+  <button id="nav-prev" type="button" aria-label="Diapositive précédente" disabled class="grid h-[clamp(36px,3.4vw,52px)] w-[clamp(36px,3.4vw,52px)] place-items-center rounded-full border border-sand/40 bg-night-deep/70 text-[clamp(18px,1.8vw,26px)] text-sand transition duration-300 hover:-translate-y-0.5 hover:border-sand hover:bg-sand/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sand disabled:opacity-30 motion-reduce:transition-none">
+    __ICON_chevron-left__
+  </button>
+  <div id="dots" class="flex items-center gap-[clamp(5px,.7vw,10px)] rounded-full bg-night-deep/40 px-[clamp(7px,1vw,14px)] py-[clamp(5px,.7vh,9px)]" role="group" aria-label="Choisir une diapositive"></div>
+  <button id="nav-next" type="button" aria-label="Diapositive suivante" class="grid h-[clamp(36px,3.4vw,52px)] w-[clamp(36px,3.4vw,52px)] place-items-center rounded-full border border-sand/40 bg-night-deep/70 text-[clamp(18px,1.8vw,26px)] text-sand transition duration-300 hover:-translate-y-0.5 hover:border-sand hover:bg-sand/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sand disabled:opacity-30 motion-reduce:transition-none">
+    __ICON_chevron-right__
+  </button>
+  <button id="nav-full" type="button" aria-label="Afficher en plein écran" class="grid h-[clamp(36px,3.4vw,52px)] w-[clamp(36px,3.4vw,52px)] place-items-center rounded-full border border-sand/40 bg-night-deep/70 text-[clamp(18px,1.8vw,26px)] text-sand transition duration-300 hover:-translate-y-0.5 hover:border-sand hover:bg-sand/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sand motion-reduce:transition-none">
+    <span class="inline-flex -rotate-45">__ICON_arrow-right__</span>
+  </button>
+</nav>
+
+<script>
+/* ============================================================
+   SCRIPT — découpage des titres, navigation, scénario, réseau
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsBox = document.getElementById('dots');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress-fill');
+  var prevBtn = document.getElementById('nav-prev');
+  var nextBtn = document.getElementById('nav-next');
+  var fullBtn = document.getElementById('nav-full');
+  var timeline = document.getElementById('timeline');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var current = 0;
+  var locked = false;
+  var scenarioTimer = null;
+  var scenarioIndex = 0;
+
+  /* Transcity DEMO ne couvre que A-Z, a-z et l'espace. Les autres
+     caractères (accents, ponctuation, chiffres) basculent en Alice. */
+  function inTranscity(char) {
+    var cp = char.codePointAt(0);
+    return cp === 32 || (cp >= 65 && cp <= 90) || (cp >= 97 && cp <= 122);
+  }
+  function splitTitle(el) {
+    var text = el.textContent.trim();
+    el.setAttribute('aria-label', text);
+    el.classList.add('split');
+    el.textContent = '';
+    var index = 0;
+    text.split(/(\s+)/).forEach(function (part) {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { el.appendChild(document.createTextNode(part)); return; }
+      var word = document.createElement('span');
+      word.className = 'word';
+      Array.from(part).forEach(function (letter) {
+        var span = document.createElement('span');
+        span.className = 'char' + (inTranscity(letter) ? '' : ' is-fallback');
+        span.style.setProperty('--ci', index++);
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = letter;
+        word.appendChild(span);
+      });
+      el.appendChild(word);
+    });
+  }
+  document.querySelectorAll('[data-split]').forEach(splitTitle);
+  /* Deux graisses sont déclarées : on précharge aussi la régulière, même si le
+     verset affiché utilise la graisse bold. */
+  document.fonts.load('16px "Aref Ruqaa"');
+  document.fonts.ready.then(measureTimeline);
+
+  /* Pastilles */
+  var dots = slides.map(function (slide, i) {
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot h-[clamp(8px,.85vw,12px)] w-[clamp(8px,.85vw,12px)] rounded-full border border-sand/60 bg-transparent transition duration-300 hover:scale-125 hover:bg-sand/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sand motion-reduce:transition-none';
+    dot.setAttribute('aria-label', 'Aller à la diapositive ' + (i + 1));
+    dot.setAttribute('aria-current', i === 0 ? 'step' : 'false');
+    dot.addEventListener('click', function () { goTo(i); });
+    dotsBox.appendChild(dot);
+    return dot;
+  });
+
+  /* Scénario animé : écrans du téléphone + ligne de progression */
+  function measureTimeline() {
+    if (!timeline) return;
+    var dots = Array.prototype.slice.call(timeline.querySelectorAll('.t-dot'));
+    if (dots.length < 2) return;
+    /* offsetTop : position de layout, insensible au scale() des diapositives inactives. */
+    var centers = dots.map(function (dot) {
+      var y = 0, node = dot;
+      while (node && node !== timeline) { y += node.offsetTop; node = node.offsetParent; }
+      return y + dot.offsetHeight / 2;
+    });
+    var first = centers[0], last = centers[centers.length - 1];
+    var active = centers[Math.min(scenarioIndex, centers.length - 1)];
+    timeline.style.setProperty('--rail-top', first.toFixed(2) + 'px');
+    timeline.style.setProperty('--rail-height', (last - first).toFixed(2) + 'px');
+    timeline.style.setProperty('--progress-height', (active - first).toFixed(2) + 'px');
+  }
+  function paintScenario() {
+    var screens = slides[3].querySelectorAll('.phone-screen');
+    var rows = slides[3].querySelectorAll('.t-row');
+    screens.forEach(function (screen, i) { screen.classList.toggle('is-current', i === scenarioIndex); });
+    rows.forEach(function (row, i) {
+      row.classList.toggle('is-current', i === scenarioIndex);
+      row.classList.toggle('is-past', i < scenarioIndex);
+    });
+    measureTimeline();
+  }
+  function stopScenario() {
+    if (scenarioTimer !== null) { window.clearInterval(scenarioTimer); scenarioTimer = null; }
+    scenarioIndex = 0;
+    paintScenario();
+  }
+  function startScenario() {
+    stopScenario();
+    if (reduced.matches) return;
+    scenarioTimer = window.setInterval(function () {
+      scenarioIndex = (scenarioIndex + 1) % 5;
+      paintScenario();
+    }, 1900);
+  }
+
+  function updateHud() {
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    progress.style.width = ((current + 1) / slides.length * 100) + '%';
+    dots.forEach(function (dot, i) {
+      dot.setAttribute('aria-current', i === current ? 'step' : 'false');
+      dot.classList.toggle('scale-125', i === current);
+      dot.classList.toggle('bg-sand', i === current);
+    });
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= slides.length || index === current || locked) return;
+    var direction = index > current ? 1 : -1;
+    document.documentElement.style.setProperty('--dir', direction);
+    var outgoing = slides[current];
+    var incoming = slides[index];
+    outgoing.classList.remove('is-active');
+    outgoing.classList.add('is-leaving');
+    outgoing.setAttribute('aria-hidden', 'true');
+    incoming.classList.remove('is-leaving');
+    incoming.classList.add('is-active');
+    incoming.setAttribute('aria-hidden', 'false');
+    if (current === 3) stopScenario();
+    current = index;
+    if (current === 3) startScenario();
+    updateHud();
+    locked = true;
+    window.setTimeout(function () {
+      outgoing.classList.remove('is-leaving');
+      locked = false;
+    }, 350);
+  }
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var key = e.key;
+    if (key === 'ArrowRight' || key === 'ArrowDown' || key === 'PageDown' || key === ' ' || key === 'Spacebar') { e.preventDefault(); next(); }
+    else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (key === 'End') { e.preventDefault(); goTo(slides.length - 1); }
+    else if (key === 'f' || key === 'F') { e.preventDefault(); toggleFullscreen(); }
+  });
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  fullBtn.addEventListener('click', toggleFullscreen);
+
+  var lastWheel = 0;
+  document.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) < 24) return;
+    var now = Date.now();
+    if (now - lastWheel < 700) return;
+    lastWheel = now;
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  var touchStart = null;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) return;
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (!touchStart || !e.changedTouches.length) return;
+    var dx = e.changedTouches[0].clientX - touchStart.x;
+    var dy = e.changedTouches[0].clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.3) { if (dx < 0) next(); else prev(); }
+  }, { passive: true });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      var request = document.documentElement.requestFullscreen;
+      if (!request) return;
+      var pending = request.call(document.documentElement);
+      if (pending && pending.catch) pending.catch(function () {});
+    } else if (document.exitFullscreen) {
+      var exit = document.exitFullscreen();
+      if (exit && exit.catch) exit.catch(function () {});
+    }
+  }
+  document.addEventListener('fullscreenchange', function () {
+    fullBtn.setAttribute('aria-label', document.fullscreenElement ? 'Quitter le plein écran' : 'Afficher en plein écran');
+  });
+
+  /* Réseau de fond : une seule boucle rAF, annulée avant tout redémarrage,
+     mise en pause lorsque l'onglet est masqué. */
+  var canvas = document.getElementById('network');
+  var ctx = canvas.getContext('2d');
+  var nodes = [];
+  var width = 0, height = 0, rafId = null;
+
+  function buildNodes() {
+    /* Grille 9 x 5 = 45 positions, moins la colonne et la rangée centrales :
+       32 nœuds répartis régulièrement. Le cœur de l'écran reste vide et les
+       liens ne joignent que des voisins, donc aucun trait ne le traverse. */
+    var cols = 9, rows = 5, cellW = width / cols, cellH = height / rows;
+    nodes = [];
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var nx = (c + 0.5) / cols, ny = (r + 0.5) / rows;
+        if (Math.abs(nx - 0.5) < 0.06 || Math.abs(ny - 0.5) < 0.11) continue;
+        var jx = (Math.sin((r * 9 + c) * 12.9898) * 43758.5453 % 1) * cellW * 0.14;
+        var jy = (Math.cos((r * 9 + c) * 78.233) * 12345.6789 % 1) * cellH * 0.14;
+        nodes.push({
+          x: (c + 0.5) * cellW + jx,
+          y: (r + 0.5) * cellH + jy,
+          gx: c, gy: r,
+          vx: (Math.sin(r * 3.1 + c) * 0.035),
+          vy: (Math.cos(c * 2.7 + r) * 0.035)
+        });
+      }
+    }
+  }
+  function drawNetwork() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.lineWidth = 0.6;
+    ctx.strokeStyle = 'rgba(210,180,140,.055)';
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!reduced.matches) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 2 || n.x > width - 2) n.vx *= -1;
+        if (n.y < 2 || n.y > height - 2) n.vy *= -1;
+      }
+      /* On ne relie que des voisins directs : les segments restent locaux
+         et ne traversent jamais la zone centrale. */
+      for (var j = i + 1; j < nodes.length; j++) {
+        var m = nodes[j];
+        if (Math.abs(n.gx - m.gx) > 1 || Math.abs(n.gy - m.gy) > 1) continue;
+        var dx = n.x - m.x, dy = n.y - m.y;
+        if (dx * dx + dy * dy > (width / 9 + height / 5) * (width / 9 + height / 5)) continue;
+        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(210,180,140,.22)';
+      ctx.beginPath(); ctx.arc(n.x, n.y, 1.2, 0, Math.PI * 2); ctx.fill();
+    }
+    if (!reduced.matches && !document.hidden) rafId = window.requestAnimationFrame(drawNetwork);
+    else rafId = null;
+  }
+  function startNetwork() {
+    if (rafId !== null) { window.cancelAnimationFrame(rafId); rafId = null; }
+    drawNetwork();
+  }
+  function resizeCanvas() {
+    if (rafId !== null) { window.cancelAnimationFrame(rafId); rafId = null; }
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth; height = window.innerHeight;
+    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildNodes();
+    measureTimeline();
+    startNetwork();
+  }
+  window.addEventListener('resize', resizeCanvas);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { if (rafId !== null) { window.cancelAnimationFrame(rafId); rafId = null; } }
+    else startNetwork();
+  });
+  if (reduced.addEventListener) reduced.addEventListener('change', startNetwork);
+  resizeCanvas();
+
+  /* Initialisation */
+  slides.forEach(function (slide, i) { if (i !== 0) slide.setAttribute('aria-hidden', 'true'); });
+  updateHud();
+  startScenario();
+})();
+</script>
+</body>
+</html>

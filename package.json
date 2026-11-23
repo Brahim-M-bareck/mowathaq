@@ -1,0 +1,15 @@
+{
+  "name": "mowathaq-presentation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Présentation interactive MOWATHAQ construite avec Tailwind CSS v3, livrée en fichier HTML autonome.",
+  "scripts": {
+    "css": "tailwindcss -i ./src/input.css -o ./src/output.css --minify",
+    "build": "tailwindcss -i ./src/input.css -o ./src/output.css --minify && node build.js",
+    "watch": "tailwindcss -i ./src/input.css -o ./src/output.css --watch"
+  },
+  "devDependencies": {
+    "lucide-static": "^1.78.0",
+    "tailwindcss": "^3.4.19"
+  }
+}

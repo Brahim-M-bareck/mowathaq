@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{--ease:cubic-bezier(.2,.8,.2,1)}
+
+/* Neutralise les couleurs par défaut de Preflight : uniquement night/sand. */
+@layer base{
+  *,::before,::after{
+    border-color:rgba(210,180,140,.2);
+    --tw-ring-offset-color:#d2b48c;
+    --tw-ring-color:rgba(210,180,140,.5);
+    --tw-ring-offset-shadow:0 0 rgba(0,33,71,0);
+    --tw-ring-shadow:0 0 rgba(0,33,71,0);
+    --tw-shadow:0 0 rgba(0,33,71,0);
+  }
+  input::placeholder,textarea::placeholder{color:rgba(210,180,140,.6)}
+}
+
+/* ============================================================
+   POLICES LOCALES — jetons remplacés par build.js (base64)
+   ============================================================ */
+@font-face{
+  font-family:'Alice';
+  src:url('__FONT_ALICE__') format('truetype');
+  font-style:normal;font-weight:400;font-display:swap;
+}
+@font-face{
+  font-family:'Transcity';
+  src:url('__FONT_TRANSITY__') format('opentype');
+  font-style:normal;font-weight:400;font-display:swap;
+}
+@font-face{
+  font-family:'Aref Ruqaa';
+  src:url('__FONT_AREF_REGULAR__') format('truetype');
+  font-style:normal;font-weight:400;font-display:swap;
+}
+@font-face{
+  font-family:'Aref Ruqaa';
+  src:url('__FONT_AREF_BOLD__') format('truetype');
+  font-style:normal;font-weight:700;font-display:swap;
+}
+
+/* ============================================================
+   CE QUE TAILWIND NE FAIT PAS BIEN (composants + keyframes)
+   Toutes les couleurs ci-dessous appartiennent à night ou sand.
+   ============================================================ */
+@layer components {
+
+  /* Fond radial unique, symétrique : night au centre, night sombre aux bords.
+     Aucun motif, aucune tache, aucun halo latéral. */
+  .app-bg{
+    background:radial-gradient(circle at 50% 50%,#002147 0%,#00162f 100%);
+  }
+  .net{
+    position:fixed;inset:0;width:100%;height:100%;
+    pointer-events:none;
+  }
+
+  /* Diapositives : fondu + glissement + léger zoom, sans blur */
+  .slide{
+    position:absolute;inset:0;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translate3d(calc(var(--dir,1) * 5%),0,0) scale(.975);
+    transition:opacity .7s ease,transform .78s var(--ease),visibility 0s linear .78s;
+  }
+  .slide.is-active{
+    opacity:1;visibility:visible;pointer-events:auto;
+    transform:none;transition-delay:0s;
+  }
+  .slide.is-leaving{
+    opacity:0;visibility:visible;
+    transform:translate3d(calc(var(--dir,1) * -5%),0,0) scale(.975);
+    transition-delay:0s;
+  }
+
+  /* Apparitions progressives. La diapositive sortante garde tout visible. */
+  .reveal{opacity:0;transform:translateY(16px)}
+  .slide.is-active .reveal{
+    animation:rise .78s var(--ease) both;
+    animation-delay:calc(120ms + var(--d,0ms));
+  }
+  .slide.is-leaving .reveal{opacity:1;transform:none;animation:none}
+  .split .word{display:inline-block;white-space:nowrap}
+  .split .char{display:inline-block;opacity:0;transform:translateY(.55em) rotate(4deg)}
+  .split .char.is-fallback{font-family:'Alice',Georgia,serif}
+  .slide.is-active .split .char{
+    animation:charIn .72s var(--ease) both;
+    animation-delay:calc(70ms + var(--ci) * 18ms);
+  }
+  .slide.is-leaving .split .char{opacity:1;transform:none;animation:none}
+
+  /* Icônes Lucide inline : style simple, aucune animation de tracé. */
+  .ico{
+    width:1em;height:1em;flex:none;display:inline-block;vertical-align:middle;
+    fill:none;stroke:currentColor;stroke-width:1.6;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  /* Petits traits de liaison (CSS, aucune icône dessinée à la main) */
+  .chain-link{height:1px;width:clamp(26px,4vw,58px);background:rgba(210,180,140,.55)}
+  .hash-link{width:clamp(16px,2.4vw,40px);height:1px;border-top:1px dashed rgba(210,180,140,.55)}
+
+  /* Point des cartes d'étapes : débord volontaire, parent sans overflow-hidden */
+  .step-dot{position:relative}
+  .step-dot::before{
+    content:"";position:absolute;top:-.44em;left:0;
+    width:.8em;height:.8em;border:1px solid #d2b48c;border-radius:50%;
+    background:#002147;transform:scale(0);
+    transition:transform .5s var(--ease) .35s;
+  }
+  .slide.is-active .step-dot::before{transform:scale(1)}
+  .slide.is-leaving .step-dot::before{transform:scale(1);transition:none}
+
+  /* Timeline : rail 2 px entre le centre du 1er et du dernier point,
+     progression calculée en JS sur les positions réelles des points. */
+  .timeline{
+    --tl-axis:20px;
+    --tl-dot:20px;
+    --rail-top:12px;
+    --rail-height:calc(100% - 24px);
+    --progress-height:0px;
+    position:relative;
+  }
+  .timeline-rail,.timeline-progress{
+    position:absolute;top:var(--rail-top);
+    left:calc(var(--tl-axis) - 1px);width:2px;
+    height:var(--rail-height);
+    background:rgba(210,180,140,.28);
+    pointer-events:none;
+  }
+  .timeline-progress{
+    left:calc(var(--tl-axis) - 2px);width:4px;
+    height:var(--progress-height);
+    background:#d2b48c;
+    box-shadow:0 0 0 1px rgba(210,180,140,.14);
+  }
+  .t-row{
+    --tl-size:clamp(16px,1.4vw,26px);
+    display:grid;grid-template-columns:40px minmax(0,1fr);
+    align-items:start;column-gap:clamp(8px,1vw,16px);
+    color:rgba(230,207,174,.6);
+    font-size:var(--tl-size);line-height:1.35;
+    transition:color .4s ease;
+  }
+  .t-row.is-current{
+    --tl-size:clamp(18px,1.55vw,30px);
+    color:#d2b48c;line-height:1.25;
+  }
+  .t-dot{
+    position:relative;z-index:1;
+    width:var(--tl-dot);height:var(--tl-dot);
+    margin-left:calc(var(--tl-axis) - var(--tl-dot) / 2);
+    margin-top:calc(.675em - var(--tl-dot) / 2);
+    border:2px solid rgba(210,180,140,.6);border-radius:50%;
+    background:#002147;
+    transition:background .4s ease,box-shadow .4s ease,transform .4s ease;
+  }
+  .t-row.is-current .t-dot{
+    margin-top:calc(.625em - var(--tl-dot) / 2);
+    background:#d2b48c;box-shadow:0 0 0 6px rgba(210,180,140,.16);
+    transform:scale(1.15);
+  }
+  .t-row.is-past .t-dot{background:#d2b48c}
+
+  /* Téléphone moderne : cadre très arrondi, encoche et barre d'accueil. */
+  .phone{
+    position:relative;aspect-ratio:9/19;
+    background:linear-gradient(160deg,#0a3b6e,#00162f);
+    box-shadow:0 24px 70px rgba(0,33,71,.6),inset 0 0 0 1px rgba(210,180,140,.08);
+  }
+  .phone::before{
+    content:"";position:absolute;z-index:3;
+    top:clamp(10px,.9vw,14px);left:50%;transform:translateX(-50%);
+    width:28%;height:clamp(5px,.6vw,8px);border-radius:99px;
+    background:rgba(210,180,140,.4);
+  }
+  .phone::after{
+    content:"";position:absolute;z-index:3;
+    bottom:clamp(8px,.8vw,12px);left:50%;transform:translateX(-50%);
+    width:32%;height:3px;border-radius:99px;
+    background:rgba(210,180,140,.35);
+  }
+  .phone-screen{
+    position:absolute;
+    inset:clamp(20px,1.8vw,26px) clamp(7px,.9vw,12px) clamp(16px,1.4vw,22px);
+    overflow:hidden;
+    background:linear-gradient(165deg,#002147,#00162f);
+    display:flex;flex-direction:column;
+    gap:clamp(6px,.8vh,12px);
+    opacity:0;transform:translateY(8px) scale(.97);
+    transition:opacity .5s ease,transform .5s var(--ease);
+  }
+  .phone-screen.is-current{opacity:1;transform:none}
+  .app-title{
+    text-align:center;font-family:'Transcity','Alice',serif;
+    letter-spacing:.1em;color:#d2b48c;
+  }
+  .app-label{text-transform:uppercase;letter-spacing:.12em;color:rgba(210,180,140,.65)}
+  .app-value{color:#e6cfae}
+  .app-badge{
+    display:flex;align-items:center;gap:.35em;color:#e6cfae;
+    margin-top:auto;
+  }
+  .app-signature{
+    display:grid;place-items:center;flex:1;min-height:0;
+    border:1px dashed rgba(210,180,140,.45);border-radius:.5em;
+    color:#d2b48c;font-size:clamp(24px,3vw,44px);
+  }
+  .app-code{display:flex;gap:.35em}
+  .app-code span{
+    flex:1;text-align:center;
+    border:1px solid rgba(210,180,140,.4);border-radius:.25em;
+    background:rgba(210,180,140,.06);color:#e6cfae;
+    padding:.2em 0;
+  }
+  .app-hash{
+    display:grid;place-items:center;flex:1;min-height:0;
+    border:1px dashed rgba(210,180,140,.45);border-radius:.5em;
+    color:#e6cfae;word-break:break-all;text-align:center;padding:.5em;
+  }
+
+  /* Verset coranique */
+  .verse{opacity:0;transform:scale(.96)}
+  .slide.is-active .verse{animation:verseIn 1.8s var(--ease) .25s both}
+  .slide.is-leaving .verse{opacity:1;transform:none;animation:none}
+
+  /* Barre de progression */
+  .progress-fill{transition:width .7s var(--ease)}
+}
+
+/* Keyframes globales */
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes charIn{from{opacity:0;transform:translateY(.55em) rotate(4deg)}to{opacity:1;transform:none}}
+@keyframes verseIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+
+/* Mobile : le texte de l'écran reste lisible à 12 px minimum. */
+@media (max-width:640px){
+  .phone-screen .app-title,
+  .phone-screen .app-label,
+  .phone-screen .app-value,
+  .phone-screen .app-badge,
+  .phone-screen .app-code span,
+  .phone-screen .app-hash{font-size:12px}
+  .phone-screen .app-signature{font-size:26px}
+}
+
+/* Filet de sécurité : même avec prefers-reduced-motion, tout reste lisible. */
+@media (prefers-reduced-motion:reduce){
+  .reveal,.split .char,.verse{opacity:1;transform:none;animation:none}
+  .timeline-progress,.t-row,.t-dot,.phone-screen,.progress-fill{transition:none}
+}
