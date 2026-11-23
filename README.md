@@ -12,4 +12,4 @@ npm run build
 
 ## Démo
 
-Lien à compléter après le déploiement.
+https://brahim-m-bareck.github.io/mowathaq/
