@@ -1,0 +1,1245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>MOWATHAQ — Plateforme numérique de documentation et de certification des contrats</title>
+<!--
+  MOWATHAQ — Présentation interactive
+  Fichier autonome : aucun framework, aucune ressource distante.
+  Polices locales fournies dans le projet (Alice, Aref Ruqaa, Transcity).
+  TODO : vérifier et citer la loi mauritanienne exacte sur la signature et les transactions électroniques.
+-->
+<style>
+/* ============================================================
+   1. VARIABLES — deux teintes et leurs nuances uniquement
+   ============================================================ */
+:root{
+  --night:#002147;
+  --night-deep:#00162f;
+  --night-soft:#0a3b6e;
+  --sand:#d2b48c;
+  --sand-light:#e6cfae;
+  --sand-deep:#b9966c;
+  --sand-a05:rgba(210,180,140,.05);
+  --sand-a10:rgba(210,180,140,.10);
+  --sand-a18:rgba(210,180,140,.18);
+  --sand-a32:rgba(210,180,140,.32);
+  --sand-a55:rgba(210,180,140,.55);
+  --night-a10:rgba(0,33,71,.10);
+  --night-a20:rgba(0,33,71,.20);
+  --night-a45:rgba(0,33,71,.45);
+  --font-body:'Alice',Georgia,'Times New Roman',serif;
+  --font-display:'Transcity','Trebuchet MS',Arial,sans-serif;
+  --font-arabic:'Aref Ruqaa','Traditional Arabic','Amiri',serif,cursive;
+  --dir:1;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  color-scheme:dark;
+}
+
+/* ============================================================
+   2. POLICES LOCALES (@font-face)
+   ============================================================ */
+@font-face{
+  font-family:'Alice';
+  src:url('Alice/Alice-Regular.ttf') format('truetype');
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+@font-face{
+  font-family:'Transcity';
+  src:url('transcity/Transcity DEMO.otf') format('opentype');
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+@font-face{
+  font-family:'Aref Ruqaa';
+  src:url('Aref_Ruqaa/ArefRuqaa-Regular.ttf') format('truetype');
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+@font-face{
+  font-family:'Aref Ruqaa';
+  src:url('Aref_Ruqaa/ArefRuqaa-Bold.ttf') format('truetype');
+  font-style:normal;
+  font-weight:700;
+  font-display:swap;
+}
+
+/* ============================================================
+   3. RESET ET MISE EN PAGE GÉNÉRALE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+html{background:var(--night)}
+body{
+  overflow:hidden;
+  background:radial-gradient(120% 90% at 50% -20%,var(--night-soft) 0%,var(--night) 46%,var(--night-deep) 100%);
+  color:var(--sand-light);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{font:inherit;color:inherit}
+.skip-link{
+  position:fixed;top:-100px;left:16px;z-index:100;
+  padding:10px 16px;background:var(--sand);color:var(--night);
+  border-radius:8px;text-decoration:none;
+}
+.skip-link:focus{top:12px}
+
+/* ============================================================
+   4. ARRIÈRE-PLAN VIVANT — arabesque SVG + réseau de nœuds
+   ============================================================ */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;color:var(--sand)}
+body.light-mode .ambient{color:var(--night)}
+.ambient svg.pattern{position:absolute;inset:0;width:100%;height:100%;opacity:.16}
+body.light-mode .ambient svg.pattern{opacity:.12}
+.ambient canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.75}
+.glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.16;background:var(--sand)}
+.glow--a{width:52vw;height:52vw;left:-18vw;top:-22vw}
+.glow--b{width:44vw;height:44vw;right:-16vw;bottom:-24vw;opacity:.10}
+body.light-mode .glow{background:var(--night-deep);opacity:.07}
+
+/* ============================================================
+   5. STRUCTURE DES DIAPOSITIVES
+   ============================================================ */
+#deck{position:fixed;inset:0;z-index:1}
+.slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(18px,3vw,54px) clamp(20px,5vw,96px) clamp(62px,8vh,96px);
+  overflow:hidden;
+  opacity:0;visibility:hidden;pointer-events:none;z-index:1;
+  transform:translate3d(calc(var(--dir)*5%),0,0) scale(.975);
+  filter:blur(5px);
+  transition:opacity .72s ease,transform .78s var(--ease),filter .72s ease,visibility 0s linear .78s;
+}
+.slide::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 60% at 50% 46%,var(--sand-a05),transparent 70%);
+}
+.slide.is-active{
+  opacity:1;visibility:visible;pointer-events:auto;z-index:3;
+  transform:none;filter:none;transition-delay:0s;
+}
+.slide.is-leaving{
+  opacity:0;visibility:visible;z-index:2;
+  transform:translate3d(calc(var(--dir)*-5%),0,0) scale(.975);
+  filter:blur(5px);transition-delay:0s;
+}
+.slide--light{
+  background:linear-gradient(135deg,var(--sand-light) 0%,var(--sand) 52%,var(--sand-deep) 100%);
+  color:var(--night);
+}
+.slide--light::before{background:radial-gradient(70% 60% at 50% 44%,rgba(230,207,174,.22),transparent 72%)}
+.wrap{
+  position:relative;z-index:2;
+  width:min(100%,1380px);max-height:100%;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:clamp(9px,1.5vh,20px);
+}
+.head{display:flex;flex-direction:column;gap:clamp(5px,.8vh,11px)}
+.eyebrow{
+  font-size:clamp(10px,1vw,15px);line-height:1.3;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--sand-a55);
+}
+.slide--light .eyebrow{color:var(--night-a45)}
+.display{
+  margin:0;font-family:var(--font-display);font-weight:400;
+  font-size:clamp(30px,5.1vw,76px);line-height:1.04;letter-spacing:.045em;
+  color:var(--sand);text-wrap:balance;
+}
+.slide--light .display{color:var(--night)}
+.display--compact{font-size:clamp(26px,3.7vw,56px)}
+.lead{
+  margin:0;max-width:74ch;font-size:clamp(13px,1.55vw,23px);line-height:1.45;
+  color:var(--sand-light);
+}
+.slide--light .lead{color:var(--night)}
+.muted{color:var(--sand-a55)}
+.slide--light .muted{color:var(--night-a45)}
+
+/* ============================================================
+   6. ICÔNES SVG EN LIGNE — tracé animé, pulsation discrète
+   ============================================================ */
+.icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ico{
+  width:1em;height:1em;flex:none;display:inline-block;
+  fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:100;stroke-dashoffset:100;
+  opacity:.15;transform:translateY(5px);
+  transition:stroke-dashoffset .95s var(--ease),opacity .6s ease,transform .6s var(--ease);
+}
+.slide.is-active .ico,.controls .ico{stroke-dashoffset:0;opacity:1;transform:none}
+.controls .ico{transition:stroke-dashoffset .9s var(--ease),opacity .5s ease,transform .3s var(--ease)}
+.nav-btn:hover .ico{animation:icoPulse 1.6s ease-in-out infinite}
+.ico--pulse{animation:icoPulse 5s ease-in-out 1.6s infinite}
+@keyframes icoPulse{0%,100%{opacity:1}50%{opacity:.62}}
+
+/* ============================================================
+   7. ANIMATIONS DE CONTENU (stagger, masque, révélation lettre)
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(16px)}
+.slide.is-active .reveal{
+  animation:rise .78s var(--ease) both;
+  animation-delay:calc(120ms + var(--d,0ms));
+}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.split .word{display:inline-block;white-space:nowrap}
+.split .char{display:inline-block;opacity:0;transform:translateY(.55em) rotate(4deg)}
+.slide.is-active .split .char{
+  animation:charIn .72s var(--ease) both;
+  animation-delay:calc(70ms + var(--ci)*28ms);
+}
+@keyframes charIn{from{opacity:0;transform:translateY(.55em) rotate(4deg)}to{opacity:1;transform:none}}
+
+/* ============================================================
+   8. COMPOSANTS COMMUNS — cartes, pastilles, bandeaux
+   ============================================================ */
+.cards{display:grid;gap:clamp(10px,1.3vw,20px)}
+.cards--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cards--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{
+  position:relative;overflow:hidden;
+  padding:clamp(13px,1.7vw,26px);
+  border:1px solid var(--sand-a18);
+  border-radius:16px;
+  background:linear-gradient(155deg,var(--sand-a10),var(--sand-a05));
+  transition:transform .35s var(--ease),box-shadow .35s ease,border-color .35s ease;
+}
+.card::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(80% 60% at 50% 0%,var(--sand-a10),transparent 70%);
+  opacity:0;transition:opacity .35s ease;
+}
+.card:hover,.card:focus-within{
+  transform:translateY(-6px);
+  border-color:var(--sand-a55);
+  box-shadow:0 18px 46px rgba(0,0,0,.24),0 0 30px var(--sand-a18);
+}
+.card:hover::after{opacity:1}
+.slide--light .card{
+  border-color:var(--night-a20);
+  background:linear-gradient(155deg,rgba(230,207,174,.38),rgba(0,33,71,.05));
+}
+.slide--light .card:hover{border-color:var(--night-a45);box-shadow:0 18px 42px var(--night-a20)}
+.card-icon{
+  width:clamp(30px,3vw,46px);height:clamp(30px,3vw,46px);
+  display:grid;place-items:center;
+  border:1px solid var(--sand-a32);border-radius:12px;
+  color:var(--sand);font-size:clamp(20px,2vw,30px);margin-bottom:clamp(8px,1.2vh,15px);
+}
+.slide--light .card-icon{border-color:var(--night-a20);color:var(--night)}
+.card h3{
+  margin:0 0 clamp(5px,.7vh,9px);
+  font-size:clamp(15px,1.45vw,22px);line-height:1.2;letter-spacing:.01em;
+}
+.card p,.card li{font-size:clamp(12px,1.08vw,17px);line-height:1.5;margin:0}
+.card ul{margin:0;padding-left:0;list-style:none;display:grid;gap:clamp(4px,.6vh,8px)}
+.card li{position:relative;padding-left:1.15em}
+.card li::before{
+  content:"";position:absolute;left:0;top:.62em;
+  width:.34em;height:.34em;border-radius:50%;background:currentColor;opacity:.65;
+}
+.band{
+  display:flex;align-items:center;gap:clamp(10px,1.4vw,20px);
+  padding:clamp(9px,1.2vh,16px) clamp(14px,1.8vw,26px);
+  border:1px solid var(--sand-a32);border-radius:14px;
+  background:var(--sand-a10);
+  font-size:clamp(12px,1.25vw,19px);line-height:1.4;
+}
+.band .ico{font-size:clamp(20px,2vw,30px);color:var(--sand)}
+.band strong{font-weight:400;color:var(--sand-light)}
+.slide--light .band{border-color:var(--night-a20);background:rgba(230,207,174,.34)}
+.slide--light .band .ico,.slide--light .band strong{color:var(--night)}
+
+/* ============================================================
+   9. DIAPOSITIVE 1 — COUVERTURE
+   ============================================================ */
+.cover{text-align:center;align-items:center;gap:clamp(10px,1.7vh,22px)}
+.seal{
+  width:clamp(66px,10vw,150px);height:clamp(66px,10vw,150px);
+  color:var(--sand);overflow:visible;
+}
+.seal .spin{transform-origin:80px 80px;animation:sealSpin 26s linear infinite}
+.seal .core{transform-origin:80px 80px;animation:sealCore 1.4s var(--ease) both;animation-delay:.15s}
+@keyframes sealSpin{to{transform:rotate(360deg)}}
+@keyframes sealCore{from{opacity:0;transform:scale(.55) rotate(-25deg)}to{opacity:1;transform:none}}
+.cover h1{
+  margin:0;font-family:var(--font-display);font-weight:400;
+  font-size:clamp(48px,9.4vw,142px);line-height:1;letter-spacing:.06em;
+  color:var(--sand);text-shadow:0 0 60px var(--sand-a18);
+}
+.cover .subtitle{max-width:26ch;font-size:clamp(14px,1.75vw,26px);line-height:1.35;margin:0;color:var(--sand-light)}
+.tagline{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  gap:clamp(8px,1.2vw,18px);font-size:clamp(11px,1.25vw,19px);color:var(--sand);
+}
+.tagline .tag{display:inline-flex;align-items:center;gap:.45em}
+.tagline .tag .ico{font-size:clamp(16px,1.6vw,24px)}
+.chain-link{width:clamp(26px,4vw,58px);height:1px;background:var(--sand-a55)}
+.cover-foot{
+  position:absolute;left:0;right:0;bottom:clamp(58px,8vh,88px);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:clamp(10px,1.02vw,15px);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--sand-a55);
+}
+
+/* ============================================================
+   10. DIAPOSITIVE 3 — FRISE ET EXPLICATION BLOCKCHAIN
+   ============================================================ */
+.step{
+  position:relative;padding-top:clamp(16px,2vh,30px);
+  border-top:1px solid var(--sand-a32);
+}
+.step::before{
+  content:"";position:absolute;top:-.42em;left:0;
+  width:.8em;height:.8em;border:1px solid var(--sand);border-radius:50%;
+  background:var(--night);transform:scale(0);
+  transition:transform .5s var(--ease) .4s;
+}
+.slide.is-active .step::before{transform:scale(1)}
+.step-num{
+  position:absolute;top:clamp(14px,1.9vh,28px);right:0;
+  font-size:clamp(12px,1.2vw,18px);letter-spacing:.2em;color:var(--sand-a55);
+}
+.step h3{margin:0 0 6px;font-size:clamp(16px,1.6vw,24px)}
+.explainer{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  align-items:center;gap:clamp(14px,2vw,30px);
+  padding:clamp(11px,1.5vh,20px) clamp(14px,2vw,28px);
+  border:1px solid var(--sand-a18);border-radius:16px;background:var(--sand-a05);
+}
+.hash-flow{display:flex;align-items:center;gap:clamp(6px,.9vw,14px);color:var(--sand)}
+.hash-flow .node{
+  width:clamp(34px,3.6vw,54px);height:clamp(34px,3.6vw,54px);
+  display:grid;place-items:center;border:1px solid var(--sand-a32);border-radius:12px;
+  font-size:clamp(18px,2vw,28px);
+}
+.hash-flow .link{width:clamp(14px,2vw,34px);height:1px;border-top:1px dashed var(--sand-a55)}
+.explainer p{margin:0;font-size:clamp(12px,1.15vw,18px);line-height:1.5;color:var(--sand-light)}
+
+/* ============================================================
+   11. DIAPOSITIVE 4 — SCÉNARIO ET MAQUETTE TÉLÉPHONE
+   ============================================================ */
+.scenario{display:grid;grid-template-columns:minmax(0,1.2fr) auto;gap:clamp(16px,3vw,52px);align-items:center}
+.timeline{position:relative;display:grid;gap:clamp(6px,1vh,13px);padding-left:clamp(26px,3vw,44px)}
+.timeline::before{
+  content:"";position:absolute;left:.45em;top:1em;bottom:1em;width:1px;
+  background:var(--sand-a32);
+}
+.timeline::after{
+  content:"";position:absolute;left:calc(.45em - 1px);top:1em;width:3px;height:0;
+  background:var(--sand);box-shadow:0 0 12px var(--sand);
+  transition:height 1.2s var(--ease) .5s;
+}
+.slide.is-active .timeline::after{height:calc(100% - 2em)}
+.t-item{position:relative;font-size:clamp(12px,1.13vw,18px);line-height:1.4;color:var(--sand-a55);transition:color .4s ease,transform .4s var(--ease)}
+.t-item::before{
+  content:"";position:absolute;left:calc(-1 * clamp(26px,3vw,44px) + .18em);top:.42em;
+  width:.62em;height:.62em;border:1px solid var(--sand-a55);border-radius:50%;
+  background:var(--night);transition:background .4s ease,box-shadow .4s ease,transform .4s ease;
+}
+.t-item.is-current{color:var(--sand-light);transform:translateX(4px)}
+.t-item.is-current::before{background:var(--sand);box-shadow:0 0 14px var(--sand);transform:scale(1.2)}
+.phone{
+  position:relative;width:clamp(126px,15vw,196px);aspect-ratio:9/16;
+  padding:clamp(6px,.7vw,10px);
+  border:2px solid var(--sand-a55);border-radius:clamp(18px,2vw,30px);
+  background:linear-gradient(160deg,var(--night-soft),var(--night-deep));
+  box-shadow:0 22px 60px rgba(0,0,0,.38),inset 0 0 0 1px var(--sand-a10);
+}
+.phone::before{
+  content:"";position:absolute;top:clamp(8px,.9vw,13px);left:50%;transform:translateX(-50%);
+  width:26%;height:.35em;max-height:6px;border-radius:99px;background:var(--sand-a32);
+}
+.phone-screen{
+  position:absolute;inset:clamp(12px,1.3vw,20px) clamp(6px,.7vw,10px) clamp(6px,.7vw,10px);
+  border-radius:clamp(10px,1.2vw,18px);overflow:hidden;
+  background:linear-gradient(165deg,var(--night),var(--night-deep));
+  padding:clamp(12px,1.3vw,20px) clamp(8px,.9vw,13px);
+  display:flex;flex-direction:column;gap:clamp(5px,.8vh,11px);
+  opacity:0;transform:translateY(8px) scale(.97);
+  transition:opacity .55s ease,transform .55s var(--ease);
+}
+.phone-screen.is-current{opacity:1;transform:none}
+.app-brand{
+  font-family:var(--font-display);font-size:clamp(9px,1vw,14px);
+  letter-spacing:.1em;color:var(--sand);text-align:center;
+}
+.app-line{height:1px;background:var(--sand-a18)}
+.app-label{font-size:clamp(7px,.72vw,10px);letter-spacing:.11em;text-transform:uppercase;color:var(--sand-a55)}
+.app-title{font-size:clamp(8px,.8vw,11px);line-height:1.3;color:var(--sand-light)}
+.app-field{
+  height:clamp(12px,1.5vw,20px);border:1px solid var(--sand-a18);border-radius:5px;
+  background:var(--sand-a05);
+}
+.app-field--short{width:62%}
+.app-row{display:flex;align-items:center;gap:6px;font-size:clamp(7px,.72vw,10px);color:var(--sand-light)}
+.app-row .ico{font-size:clamp(12px,1.2vw,18px);color:var(--sand)}
+.app-box{
+  display:grid;place-items:center;flex:1;min-height:0;
+  border:1px dashed var(--sand-a32);border-radius:9px;color:var(--sand);
+  font-size:clamp(20px,2.6vw,38px);
+}
+.code-cells{display:flex;gap:5px}
+.code-cells span{
+  flex:1;height:clamp(14px,1.8vw,24px);border:1px solid var(--sand-a32);border-radius:5px;
+  background:var(--sand-a05);
+}
+.compare{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:clamp(10px,1.5vw,24px)}
+.compare .side{
+  padding:clamp(8px,1.1vh,14px) clamp(12px,1.5vw,22px);border-radius:12px;
+  border:1px solid var(--sand-a18);background:var(--sand-a05);
+  font-size:clamp(11px,1.08vw,17px);line-height:1.4;
+}
+.compare .side strong{color:var(--sand);font-weight:400}
+.compare .arrow{color:var(--sand);font-size:clamp(20px,2.4vw,36px)}
+
+/* ============================================================
+   12. DIAPOSITIVE 8 — VERSET ET ORNEMENT
+   ============================================================ */
+.verse-frame{position:relative;text-align:center;padding:clamp(22px,4vh,48px) clamp(20px,4vw,70px)}
+.verse-frame .corner{position:absolute;width:clamp(50px,7vw,100px);height:clamp(50px,7vw,100px);color:var(--sand-a55)}
+.verse-frame .corner--tl{top:0;left:0}
+.verse-frame .corner--tr{top:0;right:0;transform:scaleX(-1)}
+.verse-frame .corner--bl{bottom:0;left:0;transform:scaleY(-1)}
+.verse-frame .corner--br{bottom:0;right:0;transform:scale(-1)}
+.verse{
+  margin:0;font-family:var(--font-arabic);font-weight:700;
+  font-size:clamp(27px,4.2vw,64px);line-height:2.15;color:var(--sand-light);
+  opacity:0;transform:scale(.96);filter:blur(7px);
+}
+.slide.is-active .verse{animation:verseIn 1.8s var(--ease) .25s both}
+@keyframes verseIn{from{opacity:0;transform:scale(.96);filter:blur(7px)}to{opacity:1;transform:none;filter:none}}
+.translation{margin:0;text-align:center;font-size:clamp(13px,1.35vw,21px);line-height:1.5;color:var(--sand-light)}
+.reference{font-size:clamp(11px,1.05vw,16px);color:var(--sand-a55);text-align:center}
+
+/* ============================================================
+   13. DIAPOSITIVE 9 — CONCLUSION
+   ============================================================ */
+.cta{
+  display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.8vw,28px);
+  padding:clamp(14px,2.2vh,28px) clamp(16px,2.4vw,36px);
+  border:1px solid var(--sand);border-radius:16px;
+  background:linear-gradient(120deg,var(--sand-a18),var(--sand-a05));
+  font-size:clamp(14px,1.6vw,25px);line-height:1.35;color:var(--sand-light);text-align:center;
+}
+.cta .ico{font-size:clamp(24px,3vw,44px)}
+.thanks{
+  margin:0;font-family:var(--font-body);font-size:clamp(22px,3vw,44px);
+  color:var(--sand);text-align:center;
+}
+.thanks .big{
+  display:inline-block;font-family:var(--font-display);font-size:clamp(40px,6.5vw,96px);letter-spacing:.05em;line-height:1.05;
+}
+.thanks .bang{
+  display:inline-block;font-family:var(--font-body);font-size:clamp(30px,5vw,74px);
+  vertical-align:baseline;
+}
+.thanks .after{display:block}
+
+/* ============================================================
+   14. NAVIGATION, PROGRESSION, COMPTEUR
+   ============================================================ */
+.controls{
+  position:fixed;z-index:20;left:0;right:0;bottom:clamp(10px,1.8vh,22px);
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(8px,1.4vw,20px);pointer-events:none;
+}
+.controls>*{pointer-events:auto}
+.nav-btn{
+  width:clamp(34px,3.4vw,48px);height:clamp(34px,3.4vw,48px);
+  display:grid;place-items:center;
+  border:1px solid var(--sand-a32);border-radius:50%;
+  background:rgba(0,22,47,.55);color:var(--sand);
+  font-size:clamp(17px,1.8vw,24px);cursor:pointer;
+  transition:background .25s ease,border-color .25s ease,transform .25s var(--ease);
+}
+.nav-btn:hover:not(:disabled){background:var(--sand-a18);border-color:var(--sand);transform:translateY(-2px)}
+.nav-btn:disabled{opacity:.28;cursor:default}
+.dots{display:flex;align-items:center;gap:clamp(5px,.7vw,10px);padding:7px 10px;border-radius:99px;background:rgba(0,22,47,.4)}
+.dot{
+  width:clamp(8px,.85vw,12px);height:clamp(8px,.85vw,12px);padding:0;
+  border:1px solid var(--sand-a55);border-radius:50%;background:transparent;cursor:pointer;
+  transition:background .3s ease,transform .3s var(--ease),box-shadow .3s ease;
+}
+.dot:hover{transform:scale(1.35);background:var(--sand-a32)}
+.dot[aria-current="step"]{background:var(--sand);box-shadow:0 0 12px var(--sand-a55);transform:scale(1.3)}
+body.light-mode .dot{border-color:var(--night-a45)}
+body.light-mode .dot[aria-current="step"]{background:var(--night);box-shadow:0 0 10px var(--night-a45)}
+.hud{position:fixed;z-index:20;left:0;right:0;top:0;pointer-events:none}
+.progress{height:3px;background:var(--sand-a10)}
+.progress span{
+  display:block;height:100%;width:11.11%;background:var(--sand);
+  box-shadow:0 0 14px var(--sand-a55);transition:width .7s var(--ease);
+}
+body.light-mode .progress{background:var(--night-a10)}
+body.light-mode .progress span{background:var(--night);box-shadow:none}
+.counter{
+  position:fixed;z-index:20;right:clamp(18px,3vw,48px);top:clamp(14px,2.4vh,28px);
+  font-size:clamp(11px,1.1vw,16px);letter-spacing:.24em;color:var(--sand-a55);
+}
+body.light-mode .counter{color:var(--night-a45)}
+:focus-visible{outline:2px solid var(--sand);outline-offset:4px}
+.slide--light :focus-visible{outline-color:var(--night)}
+
+/* ============================================================
+   15. RESPONSIVE — tablette et mobile, sans défilement interne
+   ============================================================ */
+@media (max-width:900px){
+  .wrap{gap:clamp(7px,1vh,14px)}
+  .display{font-size:clamp(27px,6vw,52px)}
+  .display--compact{font-size:clamp(24px,4.6vw,42px)}
+  .card p,.card li{font-size:clamp(11px,1.5vw,15px)}
+  .scenario{grid-template-columns:minmax(0,1fr) auto;gap:14px}
+}
+@media (max-aspect-ratio:1/1){
+  .slide{padding:clamp(16px,4vw,28px) clamp(16px,5vw,30px) clamp(58px,9vh,80px)}
+  .cards--3,.cards--2{grid-template-columns:1fr;gap:8px}
+  .card{padding:clamp(9px,2.2vh,16px) clamp(12px,3vw,18px);border-radius:12px}
+  .card-icon{width:28px;height:28px;font-size:18px;margin-bottom:5px}
+  .card h3{font-size:clamp(14px,3.6vw,19px);margin-bottom:3px}
+  .card p,.card li{font-size:clamp(11px,2.9vw,15px);line-height:1.35}
+  .lead{font-size:clamp(12px,3.2vw,17px)}
+  .band{padding:8px 12px;font-size:clamp(11px,2.9vw,15px)}
+  .explainer{grid-template-columns:1fr;gap:8px;padding:9px 12px}
+  .explainer p{font-size:clamp(11px,2.8vw,15px)}
+  .scenario{grid-template-columns:minmax(0,1fr) auto;gap:10px}
+  .timeline{gap:5px;padding-left:22px}
+  .t-item{font-size:clamp(10px,2.7vw,14px);line-height:1.3}
+  .phone{width:clamp(86px,26vw,130px)}
+  .phone-screen{padding:10px 6px}
+  .compare{grid-template-columns:1fr;gap:6px}
+  .compare .arrow{display:none}
+  .compare .side{font-size:clamp(10px,2.7vw,14px);padding:7px 10px}
+  .cover h1{font-size:clamp(38px,12vw,76px)}
+  .cover .subtitle{font-size:clamp(13px,3.5vw,19px)}
+  .tagline{font-size:clamp(10px,2.7vw,14px)}
+  .cover-foot{bottom:clamp(54px,8vh,72px);font-size:clamp(9px,2.4vw,12px)}
+  .verse{font-size:clamp(25px,7.4vw,44px);line-height:2.05}
+  .verse-frame{padding:clamp(14px,3vh,26px) clamp(8px,2vw,16px)}
+  .translation{font-size:clamp(11px,3vw,16px)}
+  .cta{font-size:clamp(12px,3.2vw,18px)}
+  .thanks{font-size:clamp(18px,5vw,30px)}
+  .thanks .big{font-size:clamp(34px,10vw,62px)}
+  .dots{padding:5px 7px}
+}
+@media (max-height:620px){
+  .slide{padding-top:14px;padding-bottom:52px}
+  .wrap{gap:6px}
+  .display{font-size:clamp(24px,4.2vw,44px)}
+  .card{padding:9px 14px}
+  .card p,.card li{line-height:1.3}
+  .verse{font-size:clamp(24px,4vw,46px);line-height:1.8}
+  .cover-foot{bottom:48px}
+  .controls{bottom:8px}
+}
+
+/* ============================================================
+   16. PRÉFÉRENCE DE MOUVEMENT RÉDUIT
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;animation-delay:0ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;transition-delay:0ms!important;
+    scroll-behavior:auto!important;
+  }
+  .ico{stroke-dashoffset:0;opacity:1;transform:none}
+  .reveal,.split .char,.verse{opacity:1;transform:none;filter:none}
+  .timeline::after{height:calc(100% - 2em)}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#nav-prev">Aller aux commandes de navigation</a>
+
+<!-- ============================================================
+     BIBLIOTHÈQUE D'ICÔNES SVG (symboles réutilisés, décoratifs)
+     Chaque tracé est normalisé à pathLength="100" pour l'animation.
+     ============================================================ -->
+<svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" pathLength="100"/><path d="M12 7.2V12l3.4 2.2" pathLength="100"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3.2h8l4 4v13.6H6z" pathLength="100"/><path d="M14 3.2v4h4M9 12h6M9 15.7h6M9 19h3.6" pathLength="100"/></symbol>
+  <symbol id="i-fraud" viewBox="0 0 24 24"><path d="M6 3.2h8l4 4v13.6H6z" pathLength="100"/><path d="M14 3.2v4h4M9.6 12.5l4.8 4.8M14.4 12.5l-4.8 4.8" pathLength="100"/></symbol>
+  <symbol id="i-informal" viewBox="0 0 24 24"><path d="M4 5.5h12v9H9l-5 3.5z" pathLength="100"/><path d="M8 9h5M8 12h3" pathLength="100"/><path d="M16.5 10.5h3.5v6l-3.5 2" pathLength="100"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 19.8l4.2-1.1L19 8a2.1 2.1 0 0 0-3-3L5.2 15.6z" pathLength="100"/><path d="M14.8 7.2l3 3M4 21.2h16" pathLength="100"/></symbol>
+  <symbol id="i-chain" viewBox="0 0 24 24"><rect x="2.7" y="8" width="9" height="8" rx="4" pathLength="100"/><rect x="12.3" y="8" width="9" height="8" rx="4" pathLength="100"/><path d="M11.2 12h1.6" pathLength="100"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.8l7.6 2.7v6.1c0 4.7-3 7.8-7.6 9.6-4.6-1.8-7.6-4.9-7.6-9.6V5.5z" pathLength="100"/><path d="M8.6 12.2l2.3 2.3 4.5-4.6" pathLength="100"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.8" y="10.4" width="14.4" height="10.2" rx="2.4" pathLength="100"/><path d="M8 10.4V7.6a4 4 0 0 1 8 0v2.8M12 14.4v2.4" pathLength="100"/></symbol>
+  <symbol id="i-fingerprint" viewBox="0 0 24 24"><path d="M8.2 20.8c-.7-2-.9-4-.6-6.2.4-3 2.1-5.4 4.4-5.4 2.4 0 4 2.4 4.4 5.4.3 2 .1 4-.6 6.2" pathLength="100"/><path d="M5.2 17.4c-.8-3.6.4-7 3-9M18.8 17.4c.8-3.6-.4-7-3-9M10.4 15.2c0-1.8.6-3 1.6-3s1.6 1.2 1.6 3c.2 2-.1 3.8-.8 5.6" pathLength="100"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.6" y="2.6" width="10.8" height="18.8" rx="2.6" pathLength="100"/><path d="M10.6 5.4h2.8M11.2 18.4h1.6" pathLength="100"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3.6v16.8M6.6 20.4h10.8M3.6 8h16.8M12 6.2L4.4 8l2.6 5.4 5-1.2M12 6.2L19.6 8 17 13.4 12 12.2" pathLength="100"/><path d="M7 13.4a3.4 3.4 0 0 0 0 5.2M17 13.4a3.4 3.4 0 0 1 0 5.2" pathLength="100"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8.2" r="3.3" pathLength="100"/><circle cx="17" cy="9" r="2.5" pathLength="100"/><path d="M2.8 20.2c.2-3.6 2.7-5.6 6.2-5.6s6 2 6.2 5.6M16.4 14.8c2.4-.3 4 1.3 4.6 4.2" pathLength="100"/></symbol>
+  <symbol id="i-city" viewBox="0 0 24 24"><path d="M3 20.6V9.4h6v11.2M9 20.6V4.6h7v16M16 20.6v-8h5v8M2 20.6h20" pathLength="100"/><path d="M11.4 7.6h2.2M11.4 11h2.2M11.4 14.4h2.2M5.2 12.2h1.6M5.2 15.6h1.6M18 15h1.4" pathLength="100"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3.6 20.4h16.8M5.6 20.4V13M10.4 20.4V8.6M15.2 20.4v-5.2M20 20.4V4.6" pathLength="100"/><path d="M4.4 11l5-4.6 4.6 2.2 5.6-6" pathLength="100"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" pathLength="100"/><path d="M8 12.2l2.7 2.7L16.3 9.3" pathLength="100"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M3.6 12h16.8M14.4 6l6 6-6 6" pathLength="100"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M20.4 12H3.6M9.6 6l-6 6 6 6" pathLength="100"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3.8H3.8V9M15 3.8h5.2V9M9 20.2H3.8V15M15 20.2h5.2V15" pathLength="100"/></symbol>
+  <symbol id="i-seal" viewBox="0 0 160 160"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle class="spin" cx="80" cy="80" r="70" stroke-dasharray="7 8"/><circle cx="80" cy="80" r="59"/><circle cx="80" cy="80" r="46" stroke-dasharray="3 7"/><path class="core" d="M80 38l9 25 25-9-9 25 25 9-25 9 9 25-25-9-9 25-9-25-25 9 9-25-25-9 25-9-9-25 25 9z"/><circle class="core" cx="80" cy="80" r="13"/></g></symbol>
+  <symbol id="i-sms" viewBox="0 0 24 24"><path d="M3.4 5.4h17.2v10.2H9.6l-6.2 4z" pathLength="100"/><circle cx="8" cy="10.4" r="1" pathLength="100"/><circle cx="12" cy="10.4" r="1" pathLength="100"/><circle cx="16" cy="10.4" r="1" pathLength="100"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.6 6.6L3.4 12l5.2 5.4M15.4 6.6L20.6 12l-5.2 5.4M13.6 4.6l-3.2 14.8" pathLength="100"/></symbol>
+  <symbol id="i-block" viewBox="0 0 24 24"><path d="M12 3.4l8 4.2v9L12 20.6 4 16.6v-9z" pathLength="100"/><path d="M4 7.6l8 4.4 8-4.4M12 12v8.6" pathLength="100"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5.4C9.4 3.8 6.2 3.4 3 4.2v14.4c3.2-.8 6.4-.4 9 1.2 2.6-1.6 5.8-2 9-1.2V4.2c-3.2-.8-6.4-.4-9 1.2z" pathLength="100"/><path d="M12 5.4v14.4" pathLength="100"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.6 12S6 6.8 12 6.8 21.4 12 21.4 12 18 17.2 12 17.2 2.6 12 2.6 12z" pathLength="100"/><circle cx="12" cy="12" r="2.8" pathLength="100"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.6 6.6 6.6 2.6-6.6 2.6L12 21.2l-2.6-6.6L2.8 12l6.6-2.6z" pathLength="100"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.4l8.4 4.3L12 12 3.6 7.7z" pathLength="100"/><path d="M3.6 12.2L12 16.5l8.4-4.3M3.6 16.3L12 20.6l8.4-4.3" pathLength="100"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3.6l9 15.8H3z" pathLength="100"/><path d="M12 9.2v4.6M12 16.6h.01" pathLength="100"/></symbol>
+</svg>
+
+<!-- Arrière-plan décoratif -->
+<div class="ambient" aria-hidden="true">
+  <svg class="pattern" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="arabesque" patternUnits="userSpaceOnUse" width="132" height="132">
+        <g fill="none" stroke="currentColor" stroke-width=".8">
+          <path d="M66 12h22l10 22-10 22H66l-10-22zM66 76h22l10 22-10 22H66l-10-22z"/>
+          <path d="M12 66h22l10 22-10 22H12L2 88zM76 66h22l10 22-10 22H76l-10-22z" opacity=".55"/>
+          <circle cx="66" cy="66" r="20"/>
+          <circle cx="66" cy="66" r="27" stroke-dasharray="2 6"/>
+          <path d="M66 34v64M34 66h64M45 45l42 42M87 45l-42 42" opacity=".45"/>
+        </g>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#arabesque)"/>
+  </svg>
+  <canvas id="network"></canvas>
+  <div class="glow glow--a"></div>
+  <div class="glow glow--b"></div>
+</div>
+
+<main id="deck" aria-label="Présentation MOWATHAQ">
+
+  <!-- 1. TITRE -->
+  <section class="slide is-active cover" id="slide-1" role="region" aria-roledescription="diapositive" aria-label="Diapositive 1 sur 9 : titre" aria-hidden="false">
+    <div class="wrap">
+      <svg class="seal reveal" style="--d:60ms" viewBox="0 0 160 160" aria-hidden="true" focusable="false">
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle class="spin" cx="80" cy="80" r="70" stroke-dasharray="7 8"/>
+          <circle cx="80" cy="80" r="59"/>
+          <circle cx="80" cy="80" r="46" stroke-dasharray="3 7"/>
+          <path class="core" d="M80 38l9 25 25-9-9 25 25 9-25 9 9 25-25-9-9 25-9-25-25 9 9-25-25-9 25-9-9-25 25 9z"/>
+          <circle class="core" cx="80" cy="80" r="13"/>
+        </g>
+      </svg>
+      <h1 class="reveal" style="--d:180ms" data-split>MOWATHAQ</h1>
+      <p class="subtitle reveal" style="--d:420ms">Plateforme numérique de documentation et de certification des contrats</p>
+      <div class="tagline reveal" style="--d:540ms">
+        <span class="tag"><svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-pen"/></svg>Signature électronique</span>
+        <span class="chain-link" aria-hidden="true"></span>
+        <span class="tag"><svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-chain"/></svg>Blockchain</span>
+        <span class="chain-link" aria-hidden="true"></span>
+        <span class="tag"><svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg>Confiance</span>
+      </div>
+    </div>
+    <div class="cover-foot reveal" style="--d:680ms">
+      <span>Atelier Pratique</span>
+      <span>ÉQUIPE 24173 · 24231 · 24029 · 24245 · 24259</span>
+    </div>
+  </section>
+
+  <!-- 2. LE PROBLÈME LOCAL -->
+  <section class="slide" id="slide-2" role="region" aria-roledescription="diapositive" aria-label="Diapositive 2 sur 9 : le problème local" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Le problème local</span>
+        <h2 class="display reveal" style="--d:90ms" data-split>CONSTAT LOCAL</h2>
+        <p class="lead reveal" style="--d:220ms">Aujourd'hui, signer un contrat est lent, risqué et souvent informel.</p>
+      </div>
+      <div class="cards cards--3">
+        <article class="card reveal" style="--d:330ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg></div>
+          <h3>Bureaucratie</h3>
+          <p>Démarches longues et déplacements multiples ; délais de validation et de légalisation.</p>
+        </article>
+        <article class="card reveal" style="--d:430ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fraud"/></svg></div>
+          <h3>Fraude</h3>
+          <p>Faux, falsification et antidatage ; documents difficiles à vérifier.</p>
+        </article>
+        <article class="card reveal" style="--d:530ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-informal"/></svg></div>
+          <h3>Informalité</h3>
+          <p>Accords verbaux ou papiers sans preuve ; litiges fréquents sans trace fiable.</p>
+        </article>
+      </div>
+      <div class="band reveal" style="--d:660ms">
+        <svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-warning"/></svg>
+        <span><strong>Conséquences :</strong> perte de temps, litiges coûteux et manque de confiance.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. LA SOLUTION -->
+  <section class="slide" id="slide-3" role="region" aria-roledescription="diapositive" aria-label="Diapositive 3 sur 9 : la solution MOWATHAQ" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">La solution MOWATHAQ</span>
+        <h2 class="display reveal" style="--d:80ms" data-split>UN PARCOURS SIMPLE</h2>
+        <p class="lead reveal" style="--d:200ms">Un contrat créé, signé et certifié en ligne, en trois étapes.</p>
+      </div>
+      <div class="cards cards--3">
+        <article class="card step reveal" style="--d:310ms">
+          <span class="step-num">01</span>
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-doc"/></svg></div>
+          <h3>Rédiger</h3>
+          <p>Modèles de contrats (location, vente, partenariat) : gain de temps.</p>
+        </article>
+        <article class="card step reveal" style="--d:410ms">
+          <span class="step-num">02</span>
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-pen"/></svg></div>
+          <h3>Signer</h3>
+          <p>Signature électronique de chaque partie, à distance : preuve infalsifiable.</p>
+        </article>
+        <article class="card step reveal" style="--d:510ms">
+          <span class="step-num">03</span>
+          <div class="card-icon"><svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-block"/></svg></div>
+          <h3>Certifier</h3>
+          <p>Empreinte du contrat enregistrée sur la Blockchain, horodatée et infalsifiable : vérification en un clic.</p>
+        </article>
+      </div>
+      <div class="explainer reveal" style="--d:650ms">
+        <div class="hash-flow" aria-hidden="true">
+          <span class="node"><svg class="ico" focusable="false"><use href="#i-doc"/></svg></span>
+          <span class="link"></span>
+          <span class="node"><svg class="ico" focusable="false"><use href="#i-code"/></svg></span>
+          <span class="link"></span>
+          <span class="node"><svg class="ico" focusable="false"><use href="#i-block"/></svg></span>
+        </div>
+        <p>Le contrat n'est pas stocké sur la Blockchain, seulement son empreinte numérique (hash). Si une seule lettre change, l'empreinte change et la fraude est détectée.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. EXEMPLE CONCRET -->
+  <section class="slide" id="slide-4" role="region" aria-roledescription="diapositive" aria-label="Diapositive 4 sur 9 : exemple concret à Zouérat" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Exemple concret</span>
+        <h2 class="display display--compact reveal" style="--d:80ms" data-split>SUR LE TERRAIN</h2>
+        <p class="lead reveal" style="--d:200ms">Un propriétaire à Zouérat loue un appartement.</p>
+      </div>
+      <div class="scenario reveal" style="--d:300ms">
+        <div class="timeline" id="timeline">
+          <div class="t-item is-current">Le propriétaire choisit le modèle « Location » et remplit le contrat sur son téléphone.</div>
+          <div class="t-item">Le locataire reçoit un lien ou un code par SMS et vérifie son identité.</div>
+          <div class="t-item">Les deux parties signent électroniquement depuis chez elles.</div>
+          <div class="t-item">L'empreinte est certifiée sur la Blockchain en quelques minutes.</div>
+          <div class="t-item">Le contrat est archivé en sécurité, vérifiable en un clic en cas de litige.</div>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone-screen is-current" data-screen="0">
+            <div class="app-brand">MOWATHAQ</div><div class="app-line"></div>
+            <span class="app-label">Nouveau contrat</span>
+            <div class="app-title">Modèle : Location</div>
+            <div class="app-field"></div><div class="app-field app-field--short"></div><div class="app-field"></div>
+            <div class="app-row"><svg class="ico"><use href="#i-doc"/></svg>Rédaction en cours</div>
+          </div>
+          <div class="phone-screen" data-screen="1">
+            <div class="app-brand">MOWATHAQ</div><div class="app-line"></div>
+            <span class="app-label">Vérification</span>
+            <div class="app-title">Code reçu par SMS</div>
+            <div class="code-cells"><span></span><span></span><span></span><span></span></div>
+            <div class="app-row"><svg class="ico"><use href="#i-phone"/></svg>Identité confirmée</div>
+          </div>
+          <div class="phone-screen" data-screen="2">
+            <div class="app-brand">MOWATHAQ</div><div class="app-line"></div>
+            <span class="app-label">Signature</span>
+            <div class="app-title">Propriétaire et locataire</div>
+            <div class="app-box"><svg class="ico"><use href="#i-pen"/></svg></div>
+            <div class="app-row"><svg class="ico"><use href="#i-check"/></svg>Deux signatures enregistrées</div>
+          </div>
+          <div class="phone-screen" data-screen="3">
+            <div class="app-brand">MOWATHAQ</div><div class="app-line"></div>
+            <span class="app-label">Certification</span>
+            <div class="app-title">Empreinte du contrat</div>
+            <div class="app-box"><svg class="ico"><use href="#i-chain"/></svg></div>
+            <div class="app-row"><svg class="ico"><use href="#i-block"/></svg>Horodatage et bloc enregistré</div>
+          </div>
+          <div class="phone-screen" data-screen="4">
+            <div class="app-brand">MOWATHAQ</div><div class="app-line"></div>
+            <span class="app-label">Archivage</span>
+            <div class="app-title">Contrat disponible</div>
+            <div class="app-box"><svg class="ico"><use href="#i-shield"/></svg></div>
+            <div class="app-row"><svg class="ico"><use href="#i-check"/></svg>Vérification en un clic</div>
+          </div>
+        </div>
+      </div>
+      <div class="compare reveal" style="--d:520ms">
+        <div class="side"><strong>Avant :</strong> plusieurs déplacements, plusieurs jours.</div>
+        <svg class="ico arrow" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg>
+        <div class="side"><strong>Avec MOWATHAQ :</strong> quelques minutes, depuis le téléphone.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. DESCRIPTION DU PROJET — diapositive claire pour le rythme -->
+  <section class="slide slide--light" id="slide-5" role="region" aria-roledescription="diapositive" aria-label="Diapositive 5 sur 9 : description du projet" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Description du projet</span>
+        <h2 class="display reveal" style="--d:80ms" data-split>LE PROJET</h2>
+      </div>
+      <div class="cards cards--3">
+        <article class="card reveal" style="--d:260ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-warning"/></svg></div>
+          <h3>Besoin</h3>
+          <ul>
+            <li>Contrats informels, lents à valider.</li>
+            <li>Exposés à la fraude.</li>
+            <li>Pas de preuve fiable ni d'archivage sûr.</li>
+          </ul>
+        </article>
+        <article class="card reveal" style="--d:360ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg></div>
+          <h3>Solution</h3>
+          <p>Plateforme web et mobile de signature électronique avec certification Blockchain et archivage sécurisé.</p>
+        </article>
+        <article class="card reveal" style="--d:460ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-people"/></svg></div>
+          <h3>Publics cibles</h3>
+          <ul>
+            <li>Particuliers : propriétaires et locataires.</li>
+            <li>Commerçants et PME.</li>
+            <li>Agences immobilières.</li>
+            <li>Notaires et administrations.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="band reveal" style="--d:600ms">
+        <svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-city"/></svg>
+        <span>Une plateforme pensée pour la réalité locale de Zouérat et de la Mauritanie.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. VALIDITÉ JURIDIQUE ET CONFIANCE -->
+  <!-- TODO : vérifier et citer la loi mauritanienne exacte sur la signature et les transactions électroniques -->
+  <section class="slide" id="slide-6" role="region" aria-roledescription="diapositive" aria-label="Diapositive 6 sur 9 : validité juridique et confiance" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Validité juridique et confiance</span>
+        <h2 class="display display--compact reveal" style="--d:80ms" data-split>UNE SIGNATURE QUI A DE LA VALEUR</h2>
+      </div>
+      <div class="cards cards--2">
+        <article class="card reveal" style="--d:260ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fingerprint"/></svg></div>
+          <h3>Identification des signataires</h3>
+          <p>Pièce d'identité, numéro de téléphone vérifié et code de confirmation par SMS.</p>
+        </article>
+        <article class="card reveal" style="--d:350ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg></div>
+          <h3>Horodatage et traçabilité</h3>
+          <p>Chaque action est datée et enregistrée.</p>
+        </article>
+        <article class="card reveal" style="--d:440ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg></div>
+          <h3>Intégrité</h3>
+          <p>L'empreinte Blockchain prouve que le contrat n'a pas été modifié.</p>
+        </article>
+        <article class="card reveal" style="--d:530ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-scale"/></svg></div>
+          <h3>Cadre légal</h3>
+          <p>Le projet s'appuie sur la reconnaissance de la signature et des transactions électroniques. Il sera mené en partenariat avec des notaires et des juristes pour garantir la validité juridique.</p>
+        </article>
+      </div>
+      <div class="band reveal" style="--d:660ms">
+        <svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg>
+        <span>La confiance se construit par la preuve, à chaque étape.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. LES VALEURS AJOUTÉES -->
+  <section class="slide" id="slide-7" role="region" aria-roledescription="diapositive" aria-label="Diapositive 7 sur 9 : les valeurs ajoutées" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Les valeurs ajoutées</span>
+        <h2 class="display reveal" style="--d:80ms" data-split>NOS VALEURS</h2>
+      </div>
+      <div class="cards cards--3">
+        <article class="card reveal" style="--d:270ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-people"/></svg></div>
+          <h3>Sociale</h3>
+          <ul>
+            <li>Confiance entre les parties.</li>
+            <li>Moins de litiges et de conflits.</li>
+            <li>Transparence et justice.</li>
+          </ul>
+        </article>
+        <article class="card reveal" style="--d:370ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-chart"/></svg></div>
+          <h3>Économique</h3>
+          <ul>
+            <li>Gain de temps et de coûts.</li>
+            <li>Transactions sécurisées.</li>
+            <li>Économie locale digitalisée.</li>
+          </ul>
+        </article>
+        <article class="card reveal" style="--d:470ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-book"/></svg></div>
+          <h3>Religieuse</h3>
+          <ul>
+            <li>Respect de l'écrit des contrats.</li>
+            <li>Protection des droits de chacun.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="band reveal" style="--d:610ms">
+        <svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-check"/></svg>
+        <span><strong>Accès simple pour tous, sans déplacement.</strong></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. RESPECT DES VALEURS DE L'ISLAM -->
+  <section class="slide" id="slide-8" role="region" aria-roledescription="diapositive" aria-label="Diapositive 8 sur 9 : respect des valeurs de l'islam" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Respect des valeurs de l'islam</span>
+        <h2 class="display display--compact reveal" style="--d:70ms" data-split>RESPECT ET CONFIANCE</h2>
+      </div>
+      <div class="verse-frame reveal" style="--d:180ms">
+        <svg class="corner corner--tl" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M2 2h34M2 2v34M8 8l22 22M8 30l22-22" stroke="currentColor" fill="none" stroke-width="1"/><circle cx="30" cy="30" r="7" stroke="currentColor" fill="none"/></svg>
+        <svg class="corner corner--tr" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M2 2h34M2 2v34M8 8l22 22M8 30l22-22" stroke="currentColor" fill="none" stroke-width="1"/><circle cx="30" cy="30" r="7" stroke="currentColor" fill="none"/></svg>
+        <svg class="corner corner--bl" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M2 2h34M2 2v34M8 8l22 22M8 30l22-22" stroke="currentColor" fill="none" stroke-width="1"/><circle cx="30" cy="30" r="7" stroke="currentColor" fill="none"/></svg>
+        <svg class="corner corner--br" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path d="M2 2h34M2 2v34M8 8l22 22M8 30l22-22" stroke="currentColor" fill="none" stroke-width="1"/><circle cx="30" cy="30" r="7" stroke="currentColor" fill="none"/></svg>
+        <p class="verse" dir="rtl" lang="ar">يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا تَدَايَنتُم بِدَيْنٍ إِلَىٰ أَجَلٍ مُّسَمًّى فَاكْتُبُوهُ</p>
+      </div>
+      <div class="reveal" style="--d:420ms">
+        <p class="translation">« Ô vous qui croyez ! Quand vous contractez une dette à échéance déterminée, mettez-la par écrit. »</p>
+        <p class="reference">Sourate Al-Baqarah, verset 282</p>
+      </div>
+      <div class="cards cards--3 reveal" style="--d:560ms">
+        <article class="card">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-pen"/></svg></div>
+          <h3>L'écrit</h3>
+          <p>Fixer l'engagement de façon claire, sans ambiguïté.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-eye"/></svg></div>
+          <h3>La transparence</h3>
+          <p>Preuve vérifiable par les parties.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-scale"/></svg></div>
+          <h3>L'éthique</h3>
+          <p>Justice, honnêteté et protection contre la tromperie.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CONCLUSION -->
+  <section class="slide" id="slide-9" role="region" aria-roledescription="diapositive" aria-label="Diapositive 9 sur 9 : conclusion" aria-hidden="true">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow reveal" style="--d:0ms">Conclusion</span>
+        <h2 class="display reveal" style="--d:80ms" data-split>CONCLUSION</h2>
+      </div>
+      <div class="cards cards--3">
+        <article class="card reveal" style="--d:260ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-warning"/></svg></div>
+          <h3>Un problème local réel</h3>
+          <p>Lenteur, fraude et informalité.</p>
+        </article>
+        <article class="card reveal" style="--d:360ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-chain"/></svg></div>
+          <h3>Une solution simple</h3>
+          <p>Signature électronique et Blockchain.</p>
+        </article>
+        <article class="card reveal" style="--d:460ms">
+          <div class="card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></div>
+          <h3>Des valeurs fortes</h3>
+          <p>Sociales, économiques et religieuses.</p>
+        </article>
+      </div>
+      <div class="cta reveal" style="--d:580ms">
+        <svg class="ico ico--pulse" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg>
+        <span>Lancer un pilote avec des propriétaires, commerçants et agences locales.</span>
+      </div>
+      <div class="reveal" style="--d:700ms">
+        <p class="thanks"><span class="big">MERCI</span><span class="bang">&#8239;!</span> <span class="after">Vos questions ?</span></p>
+        <p class="eyebrow" style="text-align:center;margin-top:8px">ÉQUIPE MOWATHAQ · 24173 · 24231 · 24029 · 24245 · 24259</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     NAVIGATION ET INDICATEURS
+     ============================================================ -->
+<div class="hud" aria-hidden="true"><div class="progress"><span id="progress-fill"></span></div></div>
+<div class="counter" id="counter" aria-hidden="true">01 / 09</div>
+<nav class="controls" aria-label="Navigation de la présentation">
+  <button class="nav-btn" id="nav-prev" type="button" aria-label="Diapositive précédente" disabled>
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-arrow-left"/></svg>
+  </button>
+  <div class="dots" id="dots" role="group" aria-label="Choisir une diapositive"></div>
+  <button class="nav-btn" id="nav-next" type="button" aria-label="Diapositive suivante">
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-arrow-right"/></svg>
+  </button>
+  <button class="nav-btn" id="nav-full" type="button" aria-label="Afficher en plein écran">
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-expand"/></svg>
+  </button>
+</nav>
+
+<script>
+/* ============================================================
+   17. SCRIPT — navigation, animations, réseau de fond
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsBox = document.getElementById('dots');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress-fill');
+  var prevBtn = document.getElementById('nav-prev');
+  var nextBtn = document.getElementById('nav-next');
+  var fullBtn = document.getElementById('nav-full');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var current = 0;
+  var locked = false;
+  var scenarioTimer = null;
+  var scenarioIndex = 0;
+
+  /* --- Révélation des titres lettre par lettre (sans casser les mots) --- */
+  function splitTitle(el) {
+    var text = el.textContent.trim();
+    el.setAttribute('aria-label', text);
+    el.textContent = '';
+    var index = 0;
+    text.split(/(\s+)/).forEach(function (part) {
+      if (!part) return;
+      if (/^\s+$/.test(part)) {
+        el.appendChild(document.createTextNode(part));
+        return;
+      }
+      var word = document.createElement('span');
+      word.className = 'word';
+      Array.from(part).forEach(function (letter) {
+        var span = document.createElement('span');
+        span.className = 'char';
+        span.style.setProperty('--ci', index++);
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = letter;
+        word.appendChild(span);
+      });
+      el.appendChild(word);
+    });
+  }
+  document.querySelectorAll('[data-split]').forEach(splitTitle);
+
+  /* --- Pastilles de navigation --- */
+  var dots = slides.map(function (slide, i) {
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot';
+    dot.setAttribute('aria-label', 'Aller à la diapositive ' + (i + 1));
+    dot.setAttribute('aria-current', i === 0 ? 'step' : 'false');
+    dot.addEventListener('click', function () { goTo(i); });
+    dotsBox.appendChild(dot);
+    return dot;
+  });
+
+  /* --- Scénario animé du téléphone (diapositive 4) --- */
+  function paintScenario() {
+    var screens = slides[3].querySelectorAll('.phone-screen');
+    var items = slides[3].querySelectorAll('.t-item');
+    screens.forEach(function (screen, i) { screen.classList.toggle('is-current', i === scenarioIndex); });
+    items.forEach(function (item, i) { item.classList.toggle('is-current', i === scenarioIndex); });
+  }
+  function stopScenario() {
+    if (scenarioTimer !== null) { window.clearInterval(scenarioTimer); scenarioTimer = null; }
+    scenarioIndex = 0;
+    paintScenario();
+  }
+  function startScenario() {
+    stopScenario();
+    if (reduced.matches) return;
+    scenarioTimer = window.setInterval(function () {
+      scenarioIndex = (scenarioIndex + 1) % 5;
+      paintScenario();
+    }, 1900);
+  }
+
+  /* --- Mise à jour des indicateurs --- */
+  function updateHud() {
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    progress.style.width = ((current + 1) / slides.length * 100) + '%';
+    dots.forEach(function (dot, i) { dot.setAttribute('aria-current', i === current ? 'step' : 'false'); });
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    document.body.classList.toggle('light-mode', slides[current].classList.contains('slide--light'));
+  }
+
+  /* --- Transition entre diapositives --- */
+  function goTo(index) {
+    if (index < 0 || index >= slides.length || index === current || locked) return;
+    var direction = index > current ? 1 : -1;
+    document.documentElement.style.setProperty('--dir', direction);
+    var outgoing = slides[current];
+    var incoming = slides[index];
+
+    outgoing.classList.remove('is-active');
+    outgoing.classList.add('is-leaving');
+    outgoing.setAttribute('aria-hidden', 'true');
+    incoming.classList.remove('is-leaving');
+    incoming.classList.add('is-active');
+    incoming.setAttribute('aria-hidden', 'false');
+
+    if (current === 3) stopScenario();
+    current = index;
+    if (current === 3) startScenario();
+    updateHud();
+
+    locked = true;
+    window.setTimeout(function () {
+      outgoing.classList.remove('is-leaving');
+      locked = false;
+    }, reduced.matches ? 30 : 800);
+  }
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  /* --- Clavier --- */
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var key = e.key;
+    if (key === 'ArrowRight' || key === 'ArrowDown' || key === 'PageDown' || key === ' ' || key === 'Spacebar') {
+      e.preventDefault(); next();
+    } else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'PageUp') {
+      e.preventDefault(); prev();
+    } else if (key === 'Home') {
+      e.preventDefault(); goTo(0);
+    } else if (key === 'End') {
+      e.preventDefault(); goTo(slides.length - 1);
+    } else if (key === 'f' || key === 'F') {
+      e.preventDefault(); toggleFullscreen();
+    }
+  });
+
+  /* --- Boutons, molette et gestes tactiles --- */
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  fullBtn.addEventListener('click', toggleFullscreen);
+
+  var lastWheel = 0;
+  document.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) < 24) return;
+    var now = Date.now();
+    if (now - lastWheel < 850) return;
+    lastWheel = now;
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  var touchStart = null;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) return;
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (!touchStart || !e.changedTouches.length) return;
+    var dx = e.changedTouches[0].clientX - touchStart.x;
+    var dy = e.changedTouches[0].clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+      if (dx < 0) next(); else prev();
+    }
+  }, { passive: true });
+
+  /* --- Plein écran --- */
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      var request = document.documentElement.requestFullscreen;
+      if (!request) return;
+      var pending = request.call(document.documentElement);
+      if (pending && pending.catch) pending.catch(function () {});
+    } else if (document.exitFullscreen) {
+      var exit = document.exitFullscreen();
+      if (exit && exit.catch) exit.catch(function () {});
+    }
+  }
+  document.addEventListener('fullscreenchange', function () {
+    fullBtn.setAttribute('aria-label', document.fullscreenElement ? 'Quitter le plein écran' : 'Afficher en plein écran');
+  });
+
+  /* --- Réseau de nœuds discret en fond --- */
+  var canvas = document.getElementById('network');
+  var ctx = canvas.getContext('2d');
+  var nodes = [];
+  var width = 0;
+  var height = 0;
+  var frame = 0;
+
+  function buildNodes() {
+    var count = Math.max(12, Math.min(34, Math.round(width * height / 52000)));
+    nodes = [];
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - .5) * .16,
+        vy: (Math.random() - .5) * .16
+      });
+    }
+  }
+  function resizeCanvas() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildNodes();
+    drawNetwork();
+  }
+  function drawNetwork() {
+    ctx.clearRect(0, 0, width, height);
+    var light = document.body.classList.contains('light-mode');
+    var line = light ? '0,33,71,' : '210,180,140,';
+    var reach = Math.min(width, height) * .19;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!reduced.matches) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > width) n.vx *= -1;
+        if (n.y < 0 || n.y > height) n.vy *= -1;
+      }
+      for (var j = i + 1; j < nodes.length; j++) {
+        var m = nodes[j];
+        var dx = n.x - m.x, dy = n.y - m.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < reach) {
+          ctx.strokeStyle = 'rgba(' + line + (0.085 * (1 - dist / reach)).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = 'rgba(' + line + (light ? '.20' : '.26') + ')';
+      ctx.beginPath(); ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2); ctx.fill();
+    }
+    if (!reduced.matches) frame = window.requestAnimationFrame(drawNetwork);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  /* --- Initialisation --- */
+  slides.forEach(function (slide, i) { if (i !== 0) slide.setAttribute('aria-hidden', 'true'); });
+  updateHud();
+  startScenario();
+})();
+</script>
+</body>
+</html>
